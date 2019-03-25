@@ -9,6 +9,8 @@ See also  :download:`climaf/projects/em.py <../climaf/projects/em.py>`
 
 # S.Senesi - april 2015
 
+from __future__ import print_function, division, unicode_literals, absolute_import
+
 import os
 
 from climaf.api import *

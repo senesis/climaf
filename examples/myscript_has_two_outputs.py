@@ -11,6 +11,8 @@ We use a data sample distributed with CliMAF
 # S.Senesi - nov 2018
 
 # Load Climaf functions
+from __future__ import print_function, division, unicode_literals, absolute_import
+
 from climaf.api import *
 
 # Access example data (which are pre-defined in CliMAF)
@@ -44,13 +46,13 @@ object_for_main_output = myscript(rst)
 other_output = object_for_main_output.secondary
 
 # Let us have a look at the Climaf definition of this object :
-print other_output
+print(other_output)
 # >>> myscript(ds('example|AMIPV6ALB2G|rst|1980|global|monthly')).secondary
 
 # Let the operations be actually done
-print cfile(other_output)
+print(cfile(other_output))
 # >>> /home/senesi/tmp/climaf_cache/e2eb2/1047e/3c007/0633e/056b0/96f66/634c1/c90b0/0f0e8/bdd84/71a31/1.nc
 
 # Check that, for CliMAF, this is actually a different content than 'object_for_main_output'
-print cfile(object_for_main_output)
+print(cfile(object_for_main_output))
 # >>> /home/senesi/tmp/climaf_cache/700ea/6519a/d069c/5b5db/a75e5/1eaa7/a6f59/3df7f/73e80/d309a/64216/d.nc

@@ -7,6 +7,8 @@ Example for declaring a dataset from a datafile, quite simply, using function fd
 # S.Senesi - sept 2015
 
 # Load Climaf functions
+from __future__ import print_function, division, unicode_literals, absolute_import
+
 from climaf.api import *
 
 # Let us use a CMIP5-compliant datafile which is included in CliMAF distro

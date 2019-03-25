@@ -9,6 +9,8 @@ It can be used to define a CliMAF dataset
 
 """
 
+from __future__ import print_function, division, unicode_literals, absolute_import
+
 # S.Senesi - sept 2014
 
 # Load Climaf functions and site settings
@@ -39,7 +41,7 @@ derive('*', 'crest', 'minus', 'rst', 'rstcs')
 
 # Ask for actually compute the variable as a file
 my_file = cfile(creShortTop)
-print my_file
+print(my_file)
 
 if my_file is None:
     exit(1)

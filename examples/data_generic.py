@@ -22,6 +22,10 @@ data organization called 'generic' :
 
 # Load Climaf functions and site settings
 # This sets logical flags 'onCiclad' and 'atCNRM'
+from __future__ import print_function, division, unicode_literals, absolute_import
+
+import os
+
 from climaf.api import *
 
 if atCNRM:
@@ -54,11 +58,9 @@ if atCNRM:
     # Let CliMAF generate a file with the exact dataset in its disk cache
     # i.e. : select period and/or variables, aggregate files...
     my_file = cfile(pr_gpcp)
-    print my_file
+    print(my_file)
 
     # Check file size and content
-    import os
-
     os.system("ls -al " + my_file)
     # os.system("ncdump -h "+my_file)
 
@@ -96,10 +98,10 @@ if onCiclad:
     cdef("frequency", "monthly")
 
     cactl = ds(project="OCMIP5", simulation="CTL", variable="CACO3", period="1860-1861")
-    print cactl.baseFiles()
+    print(cactl.baseFiles())
 
     my_file = cfile(cactl)
-    print my_file
+    print(my_file)
 
 # ---------------------------------------------------------------
 # Access OBS4MIPs data at CNRM (see comments above)
@@ -115,9 +117,9 @@ if atCNRM:
     pr_obs = ds(project="OBS4MIPS", variable="pr", frequency="monthly_mean",
                 period="1979-1980", simulation="GPCP-SG")
 
-    print pr_obs.baseFiles()
+    print(pr_obs.baseFiles())
     my_file = cfile(pr_obs)
-    print my_file
+    print(my_file)
 
 if my_file is None:
     exit(1)
@@ -140,7 +142,7 @@ dataloc(model="CNRM-CM5", frequency="fx", organization="generic", url=[pattern_f
 cdef("project", "CMIP5")
 sftlf = ds(model="CNRM-CM5", variable="sftlf", frequency="fx")
 if atCNRM:
-    print sftlf.baseFiles()
+    print(sftlf.baseFiles())
 
 # If a given experiment has modified fixed fields, you may write::
 pattern_fx_CNRM_CM5_lgm = "/cnrm/cmip/cnrm/ESG/CMIP5/output1/CNRM-CERFACS/" + \
@@ -153,7 +155,7 @@ dataloc(model="CNRM-CM5", simulation="LGM", frequency="fx", organization="generi
 
 sftlf_lgm = ds(model="CNRM-CM5", variable="sftlf", frequency="fx", simulation="LGM")
 if atCNRM:
-    print sftlf_lgm.baseFiles()
+    print(sftlf_lgm.baseFiles())
 
 # Note : access to fx fields for projects or experiments related to an
 # organization=CMIP5_DRS is built-in: no additionnal dataloc() call; and version

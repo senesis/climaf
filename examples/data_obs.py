@@ -7,6 +7,8 @@ CNRM's Lustre, using the pre-defined 'projects' : gpcp, gpcc, erai, erai-land, c
 
 """
 
+from __future__ import print_function, division, unicode_literals, absolute_import
+
 # S.Senesi - may 2015
 
 # Load Climaf functions and site settings
@@ -14,7 +16,7 @@ CNRM's Lustre, using the pre-defined 'projects' : gpcp, gpcc, erai, erai-land, c
 from climaf.api import *
 
 if not atCNRM:
-    print "This example script access data available only at CNRM"
+    print("This example script access data available only at CNRM")
     exit(0)
 
 # Playing with GPCP data

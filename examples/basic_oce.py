@@ -10,6 +10,9 @@ This example will work as is on CNRM's Lustre or Ciclad
 
 # Load Climaf functions and site settings
 # This sets logical flags 'onCiclad' and 'atCNRM'
+
+from __future__ import print_function, division, unicode_literals, absolute_import
+
 import os
 
 from climaf.api import *

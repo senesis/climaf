@@ -8,6 +8,8 @@ Handles a database of attributes for describing organization and location of dat
 
 # Created : S.Senesi - 2014
 
+from __future__ import print_function, division, unicode_literals, absolute_import
+
 import os
 import os.path
 import re

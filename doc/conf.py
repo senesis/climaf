@@ -1,4 +1,7 @@
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
+
+from __future__ import print_function, division, unicode_literals, absolute_import
 #
 # CliMAF documentation build configuration file, created by
 # sphinx-quickstart on Thu Nov  6 23:20:27 2014.

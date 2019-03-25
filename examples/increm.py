@@ -10,6 +10,9 @@ merged in a single file, for efficiency purpose.
 # S.Senesi - oct 2014
 
 # Load Climaf functions and site settings
+
+from __future__ import print_function, division, unicode_literals, absolute_import
+
 from climaf.api import *
 
 # Reset CliMAF cache content

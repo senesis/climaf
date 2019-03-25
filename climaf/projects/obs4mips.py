@@ -12,6 +12,9 @@ Example for an OBS4MIPS CMIP5 dataset declaration ::
 
 
 """
+
+from __future__ import print_function, division, unicode_literals, absolute_import
+
 import os.path
 
 if os.path.exists('/cnrm'):
