@@ -15,11 +15,12 @@ import string
 import copy
 import os.path
 
-import dataloc
-from period import init_period, cperiod, merge_periods, intersect_periods_list, lastyears, firstyears
-from clogging import clogger, dedent
-from netcdfbasics import fileHasVar, varsOfFile, timeLimits, model_id
+from . import dataloc
+from .period import init_period, cperiod, merge_periods, intersect_periods_list, lastyears, firstyears
+from .clogging import clogger, dedent
+from .netcdfbasics import fileHasVar, varsOfFile, timeLimits, model_id
 from decimal import Decimal
+from functools import reduce
 
 #: Dictionary of declared projects (type is cproject)
 cprojects = dict()
@@ -645,7 +646,7 @@ class cdataset(cobject):
             if operation == 'intersection':
                 if group_periods_on:
                     # print "periods=",periods
-                    merged_periods = [merge_periods(p) for p in periods.values()]
+                    merged_periods = [merge_periods(p) for p in list(periods.values())]
                     inter = merged_periods.pop(0)
                     for p in merged_periods:
                         inter = intersect_periods_list(inter, p)
@@ -654,7 +655,7 @@ class cdataset(cobject):
                 wildcards['period'] = inter
             elif operation == 'union':
                 to_merge = []
-                for plist in periods.values():
+                for plist in list(periods.values()):
                     to_merge.extend(plist)
                 wildcards['period'] = merge_periods(to_merge)
             elif operation is None:
@@ -805,7 +806,7 @@ class cdataset(cobject):
         >>> res4=pr_3h.check()
 
         """
-        from anynetcdf import ncf
+        from .anynetcdf import ncf
         from datetime import datetime, timedelta
         from netCDF4 import num2date
         import numpy as np
@@ -903,14 +904,14 @@ class cdataset(cobject):
             #
             # Compute period covered by data files
             if self.frequency == 'monthly' or not self.frequency:
-                filedate[0] = filedate[0].replace(day=01)
+                filedate[0] = filedate[0].replace(day=0o1)
                 if filedate[-1].month > 11:
                     filedate[-1] = filedate[-1].replace(year=filedate[-1].year + 1)
-                    filedate[-1] = filedate[-1].replace(month=01)
-                    filedate[-1] = filedate[-1].replace(day=01)
+                    filedate[-1] = filedate[-1].replace(month=0o1)
+                    filedate[-1] = filedate[-1].replace(day=0o1)
                 else:
                     filedate[-1] = filedate[-1].replace(month=filedate[-1].month + 1)
-                    filedate[-1] = filedate[-1].replace(day=01)
+                    filedate[-1] = filedate[-1].replace(day=0o1)
 
             elif self.frequency == 'daily':
                 filedate[0] = filedate[0].replace(hour=00)
@@ -946,10 +947,10 @@ class cdataset(cobject):
                                                                      (freq / 2.) * 60) % (freq * 60) - 2 * freq * 60)
 
             elif self.frequency == 'yearly' or self.frequency == 'decadal':
-                filedate[0] = filedate[0].replace(month=01)
-                filedate[0] = filedate[0].replace(day=01)
-                filedate[-1] = filedate[-1].replace(month=01)
-                filedate[-1] = filedate[-1].replace(day=01)
+                filedate[0] = filedate[0].replace(month=0o1)
+                filedate[0] = filedate[0].replace(day=0o1)
+                filedate[-1] = filedate[-1].replace(month=0o1)
+                filedate[-1] = filedate[-1].replace(day=0o1)
                 filedate[-1] = filedate[-1] + timedelta(years=1)
 
             elif self.frequency == 'fx' or self.frequency == 'annual_cycle':
@@ -1033,15 +1034,15 @@ class cens(cobject, dict):
         :py:func:`~climaf.cache.efile`
 
         """
-        if not all(map(lambda x: isinstance(x, str), dic.keys())):
+        if not all(map(lambda x: isinstance(x, str), list(dic))):
             raise Climaf_Classes_Error("Ensemble keys/labels must be strings")
-        if not all(map(lambda x: isinstance(x, cobject), dic.values())):
+        if not all(map(lambda x: isinstance(x, cobject), list(dic.values()))):
             raise Climaf_Classes_Error("Ensemble members must be CliMAF objects")
         self.sortfunc = sortfunc
         #
         dict.update(self, dic)
         #
-        keylist = self.keys()
+        keylist = list(self)
         try:
             from natsort import natsorted
             keylist = natsorted(keylist)
@@ -1061,7 +1062,7 @@ class cens(cobject, dict):
         ordered_list = [o for o in order]
         ordered_list.sort()
         if ordered_keylist is None:
-            ordered_keylist = [o for o in self]
+            ordered_keylist = list(self)
             ordered_keylist.sort()
         if ordered_list != ordered_keylist:
             raise Climaf_Classes_Error(
@@ -1078,7 +1079,7 @@ class cens(cobject, dict):
         if k not in self.order:
             self.order.append(k)
             if self.sortfunc:
-                self.order = self.sortfunc(self.keys())
+                self.order = self.sortfunc(list(self))
         self.crs = self.buildcrs()
         self.register()
 
@@ -1105,13 +1106,13 @@ class cens(cobject, dict):
     def update(self, it):
         dict.update(self, it)
         if isinstance(it, dict):
-            for el, val in it.items():
+            for el, val in list(it.items()):
                 self.order.append(el)
         else:
             for el, val in it:
                 self.order.append(el)
         if self.sortfunc:
-            self.order = self.sortfunc(self.keys())
+            self.order = self.sortfunc(list(self))
 
     def buildcrs(self, crsrewrite=None, period=None):
         rep = "cens({"
@@ -1200,7 +1201,7 @@ def eds(first=None, **kwargs):
         else:
             # Use the first attributes declared as ensemble-prone for the project
             for a in cprojects[attval["project"]].attributes_for_ensemble:
-                print "Checkin listattribute", a, "against", listattr2
+                print("Checkin listattribute", a, "against", listattr2)
                 if a in listattr2:
                     listattr2.remove(a)
                     att = a
@@ -1489,13 +1490,13 @@ def ds(*args, **kwargs):
         if dataset:
             results.append(dataset)
     if len(results) > 1:
-        e = "CRS expression %s is ambiguous among projects %s" % (crs, repr(cprojects.keys()))
+        e = "CRS expression %s is ambiguous among projects %s" % (crs, repr(list(cprojects)))
         if allow_errors_on_ds_call:
             clogger.info(e)
         else:
             raise Climaf_Classes_Error(e)
     elif len(results) == 0:
-        e = "CRS expression %s is not valid for any project in %s" % (crs, repr(cprojects.keys()))
+        e = "CRS expression %s is not valid for any project in %s" % (crs, repr(list(cprojects.keys)))
         if allow_errors_on_ds_call:
             clogger.debug(e)
         else:
@@ -2043,7 +2044,7 @@ def guess_projects(crs):
                 sep = key
         return crs[1:crs.find(sep)]
 
-    return map(guess_project, re.findall(r"ds\(([^)]*)", crs))
+    return list(map(guess_project, re.findall(r"ds\(([^)]*)", crs)))
 
 
 def browse_tree(cobj, func, results):
@@ -2065,7 +2066,7 @@ def browse_tree(cobj, func, results):
         browse_tree(cobj.father, func, partial)
     elif isinstance(cobj, cpage):
         for line in cobj.fig_lines:
-            map(lambda x: browse_tree(x, func, partial), line)
+            list(map(lambda x: browse_tree(x, func, partial), line))
     elif cobj is None:
         return
     else:
@@ -2097,7 +2098,7 @@ def domainOf(cobject):
         return domainOf(cobject.father)
     elif isinstance(cobject, cens):
         clogger.debug("for now, domainOf logic for 'cens' objet is basic (1st member)- TBD")
-        return domainOf(cobject.values()[0])
+        return domainOf(list(cobject.values())[0])
     elif cobject is None:
         return "none"
     else:
@@ -2133,7 +2134,7 @@ def attributeOf(cobject, attrib):
         else:
             return cobject.kvp.get(attrib)
     elif isinstance(cobject, cens):
-        return attributeOf(cobject.values()[0], attrib)
+        return attributeOf(list(cobject.values())[0], attrib)
     elif getattr(cobject, attrib, None):
         return getattr(cobject, attrib)
     elif isinstance(cobject, ctree):

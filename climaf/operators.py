@@ -14,8 +14,8 @@ import os
 import re
 import sys
 import subprocess
-import driver
-from clogging import clogger, dedent
+from . import driver
+from .clogging import clogger, dedent
 
 # Next definition can be splitted in a set managed by an administrator, and
 # other sets managed and fed by users. But it should be enforced that no redefinition
@@ -255,7 +255,7 @@ class cscript():
         if ex.wait() != 0:
             Climaf_Operator_Error("defining %s : command %s is not "
                                   "executable" % (name, scriptcommand))
-        executable = ex.stdout.read().replace('\n', '')
+        # executable = ex.stdout.read().replace('\n', '')
         #
         # Analyze inputs field keywords and populate dict
         # attribute 'inputs' with some properties
@@ -540,8 +540,8 @@ class Climaf_Operator_Error(Exception):
 
 if __name__ == "__main__":
     def ceval(script_name, *args, **dic):
-        print script_name, " has been called with args=", args, " and dic=", dic
-        print "Command would be:",
+        print(script_name, " has been called with args=", args, " and dic=", dic)
+        print("Command would be:", end=' ')
 
 
     cscript('test_script', 'echo $*')

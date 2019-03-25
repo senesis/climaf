@@ -27,6 +27,7 @@ from climaf.driver import cfile
 import pickle
 import shutil
 from collections import OrderedDict
+from functools import reduce
 
 
 def header(title, style_file=None):
@@ -131,7 +132,7 @@ def link(label, filename, thumbnail=None, hover=True):
         if thumbnail is not None:
 
             regex = re.compile('([0-9]+)[x*]([0-9]+)')
-            if isinstance(thumbnail, basestring) and regex.search(thumbnail):
+            if isinstance(thumbnail, str) and regex.search(thumbnail):
                 thumbnail_width = regex.search(thumbnail).group(1)
                 thumbnail_height = regex.search(thumbnail).group(2)
             else:
@@ -139,7 +140,7 @@ def link(label, filename, thumbnail=None, hover=True):
                 thumbnail_height = thumbnail
 
             if hover:
-                if isinstance(hover, basestring):
+                if isinstance(hover, str):
                     if regex.search(hover):
                         hover_width = regex.search(hover).group(1)
                         hover_height = regex.search(hover).group(2)
@@ -168,7 +169,7 @@ def link(label, filename, thumbnail=None, hover=True):
         else:
 
             if hover:
-                if isinstance(hover, basestring):
+                if isinstance(hover, str):
                     if regex.search(hover):
                         hover_width = regex.search(hover).group(1)
                         hover_height = regex.search(hover).group(2)
@@ -255,13 +256,13 @@ def cell(label, filename=None, thumbnail=None, hover=True, dirname=None, altdir=
                 tt = index_dict
             else:
                 # -- Read the content of the index
-                atlas_index_r = file(os.path.expanduser(index_atlas), "r")
+                atlas_index_r = open(os.path.expanduser(index_atlas), "rb")
                 tt = pickle.load(atlas_index_r)
                 atlas_index_r.close()
                 # -- Append the file
                 tt.update(index_dict)
             # -- Save the file
-            atlas_index_w = file(os.path.expanduser(index_atlas), "w")
+            atlas_index_w = open(os.path.expanduser(index_atlas), "wb")
             pickle.dump(tt, atlas_index_w)
             atlas_index_w.close()
 
@@ -433,11 +434,10 @@ def fline(func, farg, sargs, title=None,
     if not isinstance(sargs, dict):
         imposed_labels = False
         if not isinstance(sargs, list):
-            print "Issue with second args :" + \
-                  "not a dict nor a list (got `sargs`) "
+            print("Issue with second args : not a dict nor a list (got {}) ".format(sargs))
             return
         else:
-            sargs = OrderedDict(zip(sargs, sargs))
+            sargs = OrderedDict(list(zip(sargs, sargs)))
     rep = open_line(title)
     for key in sargs:
         allargs = [farg, sargs[key]]
@@ -481,7 +481,7 @@ def cinstantiate(objin, filout=None, should_exec=True):
         if should_exec:
             # print "Executing %s"%expression
             # try :
-            exec expression in globals()
+            exec(expression, globals())
             # except :
             #    print "Issue executing %s"%expression
         return ""
@@ -575,7 +575,7 @@ def safe_mode_cfile_plot(myplot,do_cfile=True,safe_mode=True):
 
 
 class Climaf_Html_Error(Exception):
-    from clogging import clogger, dedent
+    from .clogging import clogger, dedent
 
     def __init__(self, valeur):
         self.valeur = valeur

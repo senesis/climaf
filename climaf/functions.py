@@ -8,7 +8,7 @@ from climaf.api import *
 from climaf.operators import *
 from climaf.driver import cvalue
 from climaf import classes
-from clogging import clogger
+from .clogging import clogger
 
 
 def cscalar(dat):
@@ -488,42 +488,42 @@ def summary(dat):
       >>> summary(dat) #
     """
     if isinstance(dat, classes.cens):
-        if len(dat.keys()) > 0:
-            kvp = getattr(dat[dat.keys()[0]], 'kvp', None)
+        if len(list(dat)) > 0:
+            kvp = getattr(dat[list(dat)[0]], 'kvp', None)
             if kvp:
-                print 'Keys - values:'
-                print kvp
-            print '-- Ensemble members:'
+                print('Keys - values:')
+                print(kvp)
+            print('-- Ensemble members:')
         for m in dat.order:
             obj = dat[m]
             if isinstance(obj, climaf.classes.cdataset):
-                print m
+                print(m)
                 files = dat[m].baseFiles(ensure_dataset=False)
                 if files:
                     for f in str.split(files, ' '):
-                        print f
+                        print(f)
             else:
                 print(m + " : " + repr(obj))
-            print '--'
+            print('--')
     elif isinstance(dat, classes.cdataset):
         if not dat.baseFiles(ensure_dataset=False):
-            print '-- No file found for:'
+            print('-- No file found for:')
         else:
             for f in str.split(dat.baseFiles(ensure_dataset=False), ' '):
-                print f
+                print(f)
         return dat.kvp
     else:
-        print "Cannot handle " + repr(dat)
+        print("Cannot handle " + repr(dat))
 
 
 def projects():
     """
     Lists available projects and their associated facets.
     """
-    print '-- Available projects:'
-    for key in cprojects.keys():
-        print '-- Project:', key
-        print 'Facets =>', cprojects[key]
+    print('-- Available projects:')
+    for key in list(cprojects):
+        print('-- Project:', key)
+        print('Facets =>', cprojects[key])
 
 
 #
@@ -781,7 +781,7 @@ def ts_plot(ts, **kwargs):
             elts_dict = dict()
             for ts_elt in ts:
                 if isinstance(ts_elt, dict):
-                    elts_order.append(ts_elt.keys()[0])
+                    elts_order.append(list(ts_elt)[0])
                     elts_dict.update(ts_elt)
                 else:
                     ts_name = ts.crs
@@ -814,7 +814,7 @@ def iplot_members(ens, nplot=12, N=1, **pp):
            N = 1 to display the first set of nplots
            N = 2 to display the second set of nplots...
     """
-    members = ens.keys()
+    members = list(ens)
     new_ens = ens.copy()
     start = (N - 1) * nplot
     end = nplot * N

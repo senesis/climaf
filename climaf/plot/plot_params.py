@@ -17,15 +17,15 @@ from . import land_plot_params
 centerspecs = False
 # --> Import the sets of plot parameters that are specific to the centers (CNRM or IPSL)
 if atCNRM:
-    import atmos_plot_params_CNRM as atmos_plot_params_centerspecs
-    import ocean_plot_params_CNRM as ocean_plot_params_centerspecs
-    import land_plot_params_CNRM as land_plot_params_centerspecs
+    from . import atmos_plot_params_CNRM as atmos_plot_params_centerspecs
+    from . import ocean_plot_params_CNRM as ocean_plot_params_centerspecs
+    from . import land_plot_params_CNRM as land_plot_params_centerspecs
 
     centerspecs = True
 if atIPSL:
-    import atmos_plot_params_IPSL as atmos_plot_params_centerspecs
-    import ocean_plot_params_IPSL as ocean_plot_params_centerspecs
-    import land_plot_params_IPSL as land_plot_params_centerspecs
+    from . import atmos_plot_params_IPSL as atmos_plot_params_centerspecs
+    from . import ocean_plot_params_IPSL as ocean_plot_params_centerspecs
+    from . import land_plot_params_IPSL as land_plot_params_centerspecs
 
     centerspecs = True
 
@@ -109,18 +109,18 @@ def plot_params(variable, context, custom_plot_params=None):
             if cont in var_entry:
                 rep.update(var_entry[cont])
     else:
-        print 'Message from plot_params: ' + variable + ' is not in the list of defined plot parameters'
+        print('Message from plot_params: ' + variable + ' is not in the list of defined plot parameters')
         # -- if not, we try to split
         tmp_variable = str.split(variable, '_')[0]
         if tmp_variable in per_variable:
-            print 'We will use the plot parameters of ' + tmp_variable
+            print('We will use the plot parameters of ' + tmp_variable)
             var_entry = per_variable[tmp_variable]
             for cont in ['default', context]:
                 if cont in var_entry:
                     rep.update(var_entry[cont])
         else:
-            print 'Message from plot_params: ' + variable + ' is not in the list of defined plot parameters'
-            print 'We will use the default plot parameters.'
+            print('Message from plot_params: ' + variable + ' is not in the list of defined plot parameters')
+            print('We will use the default plot parameters.')
     return rep
 
 

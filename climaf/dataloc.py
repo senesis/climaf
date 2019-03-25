@@ -18,10 +18,10 @@ import glob
 import subprocess
 from string import Template
 
-import classes
+from . import classes
 from climaf.period import init_period, sort_periods_list
 from climaf.netcdfbasics import fileHasVar
-from clogging import clogger, dedent
+from .clogging import clogger, dedent
 from operator import itemgetter
 import ftplib as ftp
 import getpass
@@ -158,7 +158,7 @@ class dataloc():
             if re.findall("^esgf://.*", url):
                 self.organization = "ESGF"
             self.urls = [url]
-        self.urls = map(os.path.expanduser, self.urls)
+        self.urls = list(map(os.path.expanduser, self.urls))
         alt = []
         for u in self.urls:
             # if u[0] != '$' : alt.append(os.path.abspath(u)) #lv
@@ -193,9 +193,9 @@ class dataloc():
         return self.model + self.project + self.simulation + self.frequency + self.organization + repr(self.urls)
 
     def pr(self):
-        print "For model " + self.model + " of project " + self.project + \
-              " for simulation " + self.simulation + " and freq " + self.frequency + \
-              " locations are : " + repr(self.urls) + " and org is :" + self.organization
+        print("For model " + self.model + " of project " + self.project + " for simulation " + self.simulation +
+              " and freq " + self.frequency + " locations are : " + repr(self.urls) + " and org is :" +
+              self.organization)
 
 
 def getlocs(project="*", model="*", simulation="*", frequency="*"):
@@ -332,7 +332,7 @@ def selectFiles(return_wildcards=None, merge_periods_on=None, **kwargs):
             rep.remove(last)
         last = f
     # Assemble filenames in one single string
-    return string.join(rep)
+    return ' '.join(rep)
 
 
 def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwargs):
@@ -819,7 +819,7 @@ def glob_remote_data(remote, pattern):
         if host in secrets.hosts:
             username, account, password = secrets.authenticators(host)
         else:
-            username = raw_input("Enter login for host '%s': " % host)
+            username = eval(input("Enter login for host '%s': " % host))
             password = getpass.getpass("Password for host '%s' and user '%s': " % (host, username))
 
     try:
@@ -828,7 +828,7 @@ def glob_remote_data(remote, pattern):
         connect.quit()
         return listfiles
     except ftp.all_errors as err_ftp:
-        print err_ftp
+        print(err_ftp)
         raise classes.Climaf_Error("Access problem for data %s on host '%s' and user '%s'" % (pattern, host, username))
 
 
@@ -879,7 +879,7 @@ def glob_remote_data(url, pattern):
         if host in secrets.hosts:
             username, account, password = secrets.authenticators(host)
         else:
-            username = raw_input("Enter login for host '%s': " % host)
+            username = eval(input("Enter login for host '%s': " % host))
             password = getpass.getpass("Password for host '%s' and user '%s': " % (host, username))
 
     try:
@@ -888,7 +888,7 @@ def glob_remote_data(url, pattern):
         connect.quit()
         return listfiles
     except ftp.all_errors as err_ftp:
-        print err_ftp
+        print(err_ftp)
         raise classes.Climaf_Error("Access problem for data %s on host '%s' and user '%s'" % (url, host, username))
 
 

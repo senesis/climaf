@@ -23,13 +23,15 @@ from string import Template
 import tempfile
 from datetime import datetime
 
+from functools import reduce
+
 # Climaf modules
 import climaf
-import classes
-import cache
-import operators
-import cmacro
-from clogging import clogger, indent as cindent, dedent as cdedent
+from . import classes
+from . import cache
+from . import operators
+from . import cmacro
+from .clogging import clogger, indent as cindent, dedent as cdedent
 from climaf.netcdfbasics import varOfFile
 from climaf.period import init_period, cperiod
 from climaf import xdg_bin
@@ -45,7 +47,7 @@ def capply(climaf_operator, *operands, **parameters):
     res = None
     if operands is None or operands[0] is None and not allow_errors_on_ds_call:
         raise Climaf_Driver_Error("Operands is None for operator %s" % climaf_operator)
-    opds = map(str, operands)
+    opds = list(map(str, operands))
     if climaf_operator in operators.scripts:
         # clogger.debug("applying script %s to"%climaf_operator + `opds` + `parameters`)
         res = capply_script(climaf_operator, *operands, **parameters)
@@ -107,7 +109,7 @@ def capply_script(script_name, *operands, **parameters):
             params = parameters.copy()
             params["member_label"] = label
             reps.append(maketree(script_name, script, member, *opscopy, **params))
-        return classes.cens(dict(zip(order, reps)), order)
+        return classes.cens(dict(list(zip(order, reps))), order)
     else:
         return maketree(script_name, script, *operands, **parameters)
 
@@ -602,7 +604,7 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
     logfile.write("\n\nstdout and stderr of script call :\n\t " + template + "\n\n")
     try:
         subprocess.check_call(template, stdout=logfile, stderr=subprocess.STDOUT, shell=True)
-    except subprocess.CalledProcessError, inst:
+    except subprocess.CalledProcessError as inst:
         logfile.close()
         raise Climaf_Driver_Error("Something went wrong - Type 'cerr()' for details")
 
@@ -660,7 +662,7 @@ def timePeriod(cobject):
         return timePeriod(cobject.father)
     elif isinstance(cobject, classes.cens):
         clogger.debug("for now, timePeriod logic for 'cens' objet is basic (1st member)- TBD")
-        return timePeriod(cobject.values()[0])
+        return timePeriod(list(cobject.values())[0])
     else:
         return None  # clogger.error("unkown class for argument "+`cobject`)
 
@@ -704,8 +706,8 @@ def cread(datafile, varname=None, period=None):
         if varname is None:
             raise Climaf_Driver_Error("")
         if period is not None:
-            clog.warning("Cannot yet select on period (%s) using CMa for files %s - TBD" % (period, files))
-        from anynetcdf import ncf
+            clogger.warning("Cannot yet select on period (%s) using CMa for files %s - TBD" % (period, files))
+        from .anynetcdf import ncf
         fileobj = ncf(datafile)
         # import netCDF4
         # fileobj=netCDF4.Dataset(datafile)
@@ -1036,8 +1038,8 @@ def cfilePage(cobj, deep, recurse_list=None):
             comm_figsize = subprocess.Popen(args_figsize, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             output_figsize = comm_figsize.stdout.read()
             figsize = output_figsize.split(" ").pop(2)
-            fig_width = figsize.split("x").pop(0)
-            fig_height = figsize.split("x").pop(1)
+            fig_width = figsize.split(b"x").pop(0)
+            fig_height = figsize.split(b"x").pop(1)
             # Scaling and max height
             if float(fig_width) != 1. and float(fig_height) != 1.:
                 if ((float(fig_width) / float(fig_height)) * float(height)) < width:
@@ -1108,8 +1110,8 @@ def cfilePage_pdf(cobj, deep, recurse_list=None):
     page_size = "{%dpx,%dpx}" % (cobj.page_width, cobj.page_height)
     fig_nb = "%dx%d" % (len(cobj.fig_lines[0]), len(cobj.fig_lines))
     fig_delta = "%d %d" % (xmargin, ymargin)
-    preamb = "\pagestyle{empty} \usepackage{hyperref} \usepackage{graphicx} \usepackage{geometry} " \
-             "\geometry{vmargin=%dcm,hmargin=2cm}" % cobj.y
+    preamb = "\pagestyle{empty} \\usepackage{hyperref} \\usepackage{graphicx} \\usepackage{geometry} " \
+             "\\geometry{vmargin=%dcm,hmargin=2cm}" % cobj.y
 
     args = ["pdfjam", "--keepinfo", "--preamble", preamb, "--papersize", page_size, "--delta", fig_delta, "--nup",
             fig_nb]  # "%s"%preamb
