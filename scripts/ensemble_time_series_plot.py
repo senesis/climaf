@@ -185,8 +185,8 @@ labels_list = str.split(labels, '$')
 if args.highlight_period:
     highlight_period_list = str.split(args.highlight_period, ',')
     if not len(filenames_list) == len(highlight_period_list):
-        print('Provided ', len(filenames_list), ' time series and only ', len(highlight_period_list), \
-            ' periods to highlight')
+        print('Provided ', len(filenames_list), ' time series and only ', len(highlight_period_list),
+              ' periods to highlight')
         print('==> Discard highlighting')
         args.highlight_period = None
 

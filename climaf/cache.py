@@ -134,7 +134,7 @@ def generateUniqueFileName_safe(expression, operator=None, format="nc"):
         number += 2
         if number >= len(full):
             clogger.critical("Critical issue in cache : " + len(full) + " digits is not enough for " + expression)
-            exit
+            exit()
         guess = full[0: number - 1]
         existing = searchFile(prefix + stringToPath(guess, directoryNameLength) + "." + format)
         if existing:

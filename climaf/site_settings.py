@@ -43,9 +43,9 @@ if 'ergon' in HostName:
 if 'Spip' in HostName or 'lsce3005' in HostName or 'lsce3072' in HostName or os.path.exists(Home + '/.spip'):
     onSpip = True
     atIPSL = True
-    print 'Spip trouve'
-    VolumesDir = os.getenv ('VolumesDir')
-if os.path.exists('/data/scratch/globc') :
-    atCerfacs=True
+    print('Spip trouve')
+    VolumesDir = os.getenv('VolumesDir')
+if os.path.exists('/data/scratch/globc'):
+    atCerfacs = True
 
 print ("LC debug :",atCerfacs)
