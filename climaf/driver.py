@@ -1036,8 +1036,9 @@ def cfilePage(cobj, deep, recurse_list=None):
             # Real size of figure in pixels: [fig_width x fig_height]
             args_figsize = ["identify", figfile]
             comm_figsize = subprocess.Popen(args_figsize, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            output_figsize = comm_figsize.stdout.read()
+            output_figsize = comm_figsize.stdout.read().decode(encoding="utf-8")
             figsize = output_figsize.split(" ").pop(2)
+            figsize = figsize.encode(encoding="utf-8")
             fig_width = figsize.split(b"x").pop(0)
             fig_height = figsize.split(b"x").pop(1)
             # Scaling and max height

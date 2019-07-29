@@ -557,17 +557,17 @@ def safe_mode_cfile_plot(myplot,do_cfile=True,safe_mode=True):
     else:
        # -- We try to 'cfile' the plot
        if not safe_mode:
-          print '-- plot function is not in safe mode --'
+          print('-- plot function is not in safe mode --')
           return cfile(myplot)
        else:
           try:
              plot_filename = cfile(myplot)
-             print '--> Successfully plotted ',myplot
+             print('--> Successfully plotted ',myplot)
              return plot_filename
           except:
              # -- In case it didn't work, we try to see if it comes from the availability of the data
-             print '!! Plotting failed ',myplot
-             print "set clog('debug') and safe_mode=False to identify where the plotting failed"
+             print('!! Plotting failed ',myplot)
+             print("set clog('debug') and safe_mode=False to identify where the plotting failed")
              return blank_cell
 
 
