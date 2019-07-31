@@ -14,25 +14,14 @@ import re
 import string
 import copy
 import os.path
-
-from . import dataloc
-from .period import init_period, cperiod, merge_periods, intersect_periods_list, lastyears, firstyears
-from .clogging import clogger, dedent
-from .netcdfbasics import fileHasVar, varsOfFile, timeLimits, model_id
-from decimal import Decimal
 from functools import reduce
 
-#: Dictionary of declared projects (type is cproject)
-cprojects = dict()
-
-#: Dictionary of aliases dictionaries
-aliases = dict()
-
-#: Dictionary of frequency names dictionaries
-frequencies = dict()
-
-#: Dictionary of realms names dictionaries
-realms = dict()
+from climaf.environment import get_variable, change_variable
+from climaf.utils import Climaf_Classes_Error
+from climaf.dataloc import isLocal, getlocs, selectFiles, dataloc
+from climaf.period import init_period, cperiod, merge_periods, intersect_periods_list, lastyears, firstyears
+from climaf.clogging import clogger
+from climaf.netcdfbasics import fileHasVar, varsOfFile, timeLimits, model_id
 
 
 class cproject():
@@ -106,6 +95,7 @@ class cproject():
         used when accessing datafiles); see :py:func:`~climaf.classes.cfreqs`)
 
         """
+        cprojects = get_variable("cprojects")
         if name in cprojects:
             clogger.warning("Redefining project %s" % name)
         self.project = name
@@ -132,6 +122,7 @@ class cproject():
         if self.separator == ",":
             raise Climaf_Classes_Error("Character ',' is forbidden as a project separator")
         cprojects[name] = self
+        change_variable("cprojects", cprojects)
         self.crs = ""
         # Build the pattern for the datasets CRS for this cproject
         for f in self.facets:
@@ -179,7 +170,7 @@ def cdef(attribute, value=None, project=None):
     >>> cdef('project','OCMPI5')
     >>> cdef('frequency','monthly',project='OCMPI5')
     """
-
+    cprojects = get_variable("cprojects")
     if project not in cprojects:
         raise Climaf_Classes_Error("project '%s' has not yet been declared" % project)
     if attribute == 'project':
@@ -194,6 +185,7 @@ def cdef(attribute, value=None, project=None):
         return rep
     else:
         cprojects[project].facet_defaults[attribute] = value
+    change_variable("cprojects", cprojects)
 
 
 cproject(None)
@@ -248,6 +240,7 @@ def processDatasetArgs(**kwargs):
     Also complement with default values as handled by the
     project's definition and by cdef()
     """
+    cprojects = get_variable("cprojects")
     if 'project' in kwargs:
         project = kwargs['project']
     else:
@@ -397,6 +390,7 @@ class cdataset(cobject):
         # Normalized name is annual_cycle, but allow also for 'seasonal' for the time being
         if self.frequency in ['seasonal', 'annual_cycle']:
             self.period.fx = True
+        frequencies = get_variable("frequencies")
         freqs_dic = frequencies.get(self.project, None)
         # print freqs_dic
         if freqs_dic:
@@ -426,6 +420,7 @@ class cdataset(cobject):
         self.register()
 
     def buildcrs(self, period=None, crsrewrite=None):
+        cprojects = get_variable("cprojects")
         crs_template = string.Template(cprojects[self.project].crs)
         dic = self.kvp.copy()
         if period is not None:
@@ -458,8 +453,7 @@ class cdataset(cobject):
     def isLocal(self):
         # return self.baseFiles().find(":")<0
         model = getattr(self, "model", "*")
-        return (dataloc.isLocal(project=self.project, model=model, simulation=self.simulation,
-                                frequency=self.frequency))
+        return isLocal(project=self.project, model=model, simulation=self.simulation, frequency=self.frequency)
 
     def isCached(self):
         """ TBD : analyze if a remote dataset is locally cached
@@ -470,8 +464,7 @@ class cdataset(cobject):
         return rep
 
     def oneVarPerFile(self):
-        locs = dataloc.getlocs(project=self.project, model=self.model, simulation=self.simulation,
-                               frequency=self.frequency)
+        locs = getlocs(project=self.project, model=self.model, simulation=self.simulation, frequency=self.frequency)
         return all([org for org, freq, url in locs])
 
     def periodIsFine(self):
@@ -632,7 +625,7 @@ class cdataset(cobject):
         wildcards = None
         # if option != 'check_and_store' :
         wildcards = dict()
-        files = dataloc.selectFiles(return_wildcards=wildcards, merge_periods_on=group_periods_on, **dic)
+        files = selectFiles(return_wildcards=wildcards, merge_periods_on=group_periods_on, **dic)
         # -- Use the requested variable instead of the aliased
         if self.alias:
             dic["variable"] = req_var
@@ -687,6 +680,7 @@ class cdataset(cobject):
                 else:
                     if kw == 'variable':  # Should take care of aliasing to fileVar
                         matching_vars = set()
+                        aliases = get_variable("aliases")
                         paliases = aliases.get(self.project, [])
                         for variable in paliases:
                             if val == paliases[variable][0]:
@@ -810,7 +804,7 @@ class cdataset(cobject):
 
         """
         from .anynetcdf import ncf
-        from datetime import datetime, timedelta
+        from datetime import timedelta
         from netCDF4 import num2date
         import numpy as np
 
@@ -839,6 +833,7 @@ class cdataset(cobject):
             for filename in str.split(files, ' '):
                 fileobj = ncf(filename)
                 #
+                aliases = get_variable("aliases")
                 if self.project in aliases and var in aliases[self.project]:
                     var = aliases[self.project][var][0]
                 #
@@ -1170,6 +1165,7 @@ def eds(first=None, **kwargs):
     of these attributes appears first in member labels
 
     """
+    cprojects = get_variable("cprojects")
     attval = processDatasetArgs(**kwargs)
     # Check that any facet/attribute of type 'list' (for defining an
     # ensemble) is OK for the project, and that there is at most one
@@ -1484,6 +1480,7 @@ def ds(*args, **kwargs):
 
     crs = args[0]
     results = []
+    cprojects = get_variable("cprojects")
     for cproj in cprojects:
         try:
             dataset = cprojects[cproj].crs2ds(crs)
@@ -1527,7 +1524,9 @@ def cfreqs(project, dic):
     >>> cfreqs('CMIP5',{'monthly':'mon' , 'daily':'day' })
     """
     #
+    frequencies = get_variable("frequencies")
     frequencies[project] = dic
+    change_variable("frequencies", frequencies)
 
 
 def crealms(project, dic):
@@ -1547,7 +1546,9 @@ def crealms(project, dic):
     >>> crealms('CMIP5',{'atmos':'ATM' , 'ocean':'OCE' })
     """
     #
+    realms = get_variable("realms")
     realms[project] = dic
+    change_variable("realms", realms)
 
 
 def calias(project, variable, fileVariable=None, scale=1., offset=0., units=None, missing=None, filenameVar=None):
@@ -1586,8 +1587,9 @@ def calias(project, variable, fileVariable=None, scale=1., offset=0., units=None
         fileVariable = variable
     if not filenameVar:
         filenameVar = None
-    if project not in cprojects:
+    if project not in get_variable("cprojects"):
         raise Climaf_Classes_Error("project %s is not known" % project)
+    aliases = get_variable("aliases")
     if project not in aliases:
         aliases[project] = dict()
     if type(variable) is not list:
@@ -1600,6 +1602,7 @@ def calias(project, variable, fileVariable=None, scale=1., offset=0., units=None
         units = [units]
     for v, u, fv, fnv in zip(variable, units, fileVariable, filenameVar):
         aliases[project][v] = (fv, scale, offset, u, fnv, missing)
+    change_variable("aliases", aliases)
 
 
 def varIsAliased(project, variable):
@@ -1608,6 +1611,7 @@ def varIsAliased(project, variable):
     missing) defining how to compute a 'variable' which is not in
     files, for the 'project'
     """
+    aliases = get_variable("aliases")
     if project in aliases and variable in aliases[project]:
         return aliases[project][variable]
 
@@ -2169,26 +2173,6 @@ def resolve_first_or_last_years(kwargs, duration, option="last"):
         kwargs['period'] = '*'
     explorer = ds(**kwargs)
     return explorer.explore('resolve')
-
-
-class Climaf_Classes_Error(Exception):
-    def __init__(self, valeur):
-        self.valeur = valeur
-        clogger.error(self.__str__())
-        dedent(100)
-
-    def __str__(self):
-        return repr(self.valeur)
-
-
-class Climaf_Error(Exception):
-    def __init__(self, valeur):
-        self.valeur = valeur
-        clogger.error(self.__str__())
-        dedent(100)
-
-    def __str__(self):
-        return repr(self.valeur)
 
 
 def test():

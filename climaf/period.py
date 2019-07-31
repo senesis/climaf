@@ -10,7 +10,8 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 
 import re
 import datetime
-import copy
+import six
+
 from climaf.clogging import clogger, dedent
 
 
@@ -182,7 +183,7 @@ def init_period(dates):
     """
 
     # clogger.debug("analyzing  %s"%dates)
-    if not type(dates) is str:
+    if not isinstance(dates, six.string_types):
         raise Climaf_Period_Error("arg is not a string : " + repr(dates))
     if dates == 'fx':
         return cperiod('fx')

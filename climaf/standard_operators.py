@@ -14,6 +14,7 @@ from climaf.operators import cscript, fixed_fields
 from climaf.clogging import clogger
 from climaf.site_settings import onCiclad
 
+
 scriptpath = cpath[0] + "/../scripts/"
 binpath = cpath[0] + "/../bin/"
 
