@@ -17,18 +17,14 @@ import subprocess
 
 from climaf.utils import Climaf_Operator_Error
 from .clogging import clogger
+from climaf.environment import get_variable, change_variable
+#from climaf import driver
 
 # Next definition can be splitted in a set managed by an administrator, and
 # other sets managed and fed by users. But it should be enforced that no redefinition
 # occurs for some really basic operators (should it ?)
+# TODO : Find out whether this variable is used or not
 internals = []
-scripts = dict()
-operators = dict()
-derived_variables = dict()
-
-known_formats = ['nc', 'graph', 'txt']
-graphic_formats = ['png', 'pdf', 'eps']
-none_formats = [None, 'txt']
 
 
 class scriptFlags():
@@ -242,6 +238,7 @@ class cscript():
            "CNRM-CM5 is fine$IPSL-CM5-LR is not bad$CCSM-29 is ..."
 
         """
+        scripts = get_variable("scripts")
         # Check that script name do not clash with an existing symbol
         if name in sys.modules['__main__'].__dict__ and name not in scripts:
             clogger.error("trying to define %s as an operator, "
@@ -345,12 +342,14 @@ class cscript():
         self.flags = scriptFlags(canOpendap, canSelectVar, canSelectTime, canSelectDomain, canAggregateTime, canAlias,
                                  canMissing, commuteWithEnsemble, commuteWithTimeConcatenation,
                                  commuteWithSpaceConcatenation)
-        if format in known_formats or format in graphic_formats or format in none_formats:
+        graphic_formats = get_variable("graphic_formats")
+        if format in get_variable("known_formats") or format in graphic_formats or format in get_variable("none_formats"):
             self.outputFormat = format
         else:
             raise Climaf_Operator_Error(
                 "Allowed formats yet are : 'object', 'nc', 'txt', %s" % ', '.join([repr(x) for x in graphic_formats]))
         scripts[name] = self
+        change_variable("scripts", scripts)
 
         # Init doc string for the operator
         doc = "CliMAF wrapper for command : %s" % self.command
@@ -421,8 +420,10 @@ def fixed_fields(operator, *paths):
     else:
         namelist = operator
 
+    scripts = get_variable("scripts")
     for name_op in namelist:
         scripts[name_op].fixedfields = paths
+    change_variable("scripts", scripts)
 
 
 class coperator():
@@ -479,6 +480,7 @@ def derive(project, derivedVar, Operator, *invars, **params):
     # are single derived variable names, and which will be used at the
     # object evaluation step
     # Also : some consistency checks w.r.t. script definition
+    scripts = get_variable("scripts")
     if Operator in scripts:
         if not isinstance(derivedVar, dict):
             derivedVar = dict(out=derivedVar)
@@ -495,10 +497,12 @@ def derive(project, derivedVar, Operator, *invars, **params):
                 return
             # TBD : check parameters number  ( need to build
             # its list in cscript.init() )
+            derived_variables = get_variable("derived_variables")
             if project not in derived_variables:
                 derived_variables[project] = dict()
             derived_variables[project][derivedVar[outname]] = (Operator, outname, list(invars), params)
-    elif Operator in operators:
+            change_variable("derived_variables", derived_variables)
+    elif Operator in get_variable("operators"):
         clogger.warning("Cannot yet handle derived variables based on internal operators")
     else:
         clogger.error("second argument (%s) must be a script or operator, already declared" % repr(Operator))
@@ -508,6 +512,7 @@ def is_derived_variable(variable, project):
     """ True if the variable is a derived variable, either in provided project
     or in wildcard project '*'
     """
+    derived_variables = get_variable("derived_variables")
     rep = (project in derived_variables and variable in derived_variables[project] or
            "*" in derived_variables and variable in derived_variables["*"])
     clogger.debug("Checking if variable %s is derived for project %s : %s" % (variable, project, rep))
@@ -517,6 +522,7 @@ def is_derived_variable(variable, project):
 def derived_variable(variable, project):
     """ Returns the entry defining a derived variable in requested project or in wildcard project '*'
     """
+    derived_variables = get_variable("derived_variables")
     if project in derived_variables and variable in derived_variables[project]:
         rep = derived_variables[project][variable]
     elif "*" in derived_variables and variable in derived_variables["*"]:
