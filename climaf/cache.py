@@ -16,16 +16,16 @@ import os
 import os.path
 import re
 import time
-import glob
 import pickle
 import uuid
 import hashlib
 from operator import itemgetter
 
 from climaf import version
+from climaf.utils import Climaf_Cache_Error
 from .classes import compare_trees, cobject, cdataset, guess_projects, allow_error_on_ds
 from .cmacro import crewrite
-from .clogging import clogger, dedent
+from .clogging import clogger
 from . import operators
 
 currentCache = None
@@ -994,11 +994,3 @@ def rebuild():
     return crs2filename
 
 
-class Climaf_Cache_Error(Exception):
-    def __init__(self, valeur):
-        self.valeur = valeur
-        clogger.error(self.__str__())
-        dedent(100)
-
-    def __str__(self):
-        return repr(self.valeur)
