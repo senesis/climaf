@@ -20,6 +20,7 @@ import ftplib as ftp
 import getpass
 import netrc
 from functools import partial
+import six
 
 from climaf.environment import get_variable
 from climaf.utils import Climaf_Error
@@ -438,7 +439,7 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
                     facet_value = oc.group(kw)
                 except:
                     continue
-                if type(kwargs[kw]) is str and ("*" in kwargs[kw] or "?" in kwargs[kw]):
+                if isinstance(kwargs[kw], six.string_types) and ("*" in kwargs[kw] or "?" in kwargs[kw]):
                     if facet_value is not None:
                         if kw not in wildcards:
                             wildcards[kw] = set()
@@ -472,7 +473,7 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
     period = kwargs['period']
     if period == "*":
         periods = []  # Init an empty list of all periods
-    elif type(period) is str:
+    elif isinstance(period, six.string_types):
         period = init_period(period)
     #
     variable = kwargs['variable']
@@ -570,7 +571,7 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
         alt_basename = basename.replace("?", ".").replace("*", ".*")
         alt_kwargs = kwargs.copy()
         for kw in kwargs:
-            if type(kwargs[kw]) is str:  # This excludes period attribute, which has a type
+            if isinstance(kwargs[kw], six.string_types):  # This excludes period attribute, which has a type
                 alt_kwargs[kw] = kwargs[kw].replace("?", ".").replace("*", ".*")
                 alt_basename = alt_basename.replace(r"${%s}" % kw, r"(?P<%s>%s)" % (kw, alt_kwargs[kw]), 1)
         facets_regexp = Template(alt_basename).safe_substitute(**alt_kwargs)

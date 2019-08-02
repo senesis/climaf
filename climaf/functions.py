@@ -9,6 +9,7 @@ from climaf.driver import cvalue, cfile
 from climaf import classes
 from .clogging import clogger
 from climaf.environment import get_variable
+from six import string_types
 
 
 def cscalar(dat):
@@ -54,7 +55,7 @@ def fmul(dat1, dat2):
       >>> c = '-1'  #a constant
       >>> ds1_times_c = fmul(ds1,c) # ds1 * c
     """
-    if isinstance(dat2, (str, float, int)):
+    if isinstance(dat2, string_types + [int,]):
         c = str(float(dat2))
         return ccdo(dat1, operator='mulc,' + c)
     else:

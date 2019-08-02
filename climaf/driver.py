@@ -23,13 +23,15 @@ from string import Template
 import tempfile
 from datetime import datetime
 from functools import reduce
+from six import string_types
 
 
 # Climaf modules
 import climaf
-from . import classes
-from . import cache
-from . import operators
+from climaf.operators_scripts import scriptFlags
+from climaf.operators_derive import is_derived_variable, derived_variable, derive
+from climaf import classes
+from climaf import cache
 from climaf.cmacro import cmacros, instantiate
 from climaf.clogging import clogger, indent as cindent, dedent as cdedent
 from climaf.netcdfbasics import varOfFile
@@ -37,8 +39,6 @@ from climaf.period import init_period
 from climaf import xdg_bin
 from climaf.classes import allow_errors_on_ds_call
 from climaf.environment import get_variable
-
-logdir = "."
 
 
 def capply(climaf_operator, *operands, **parameters):
@@ -193,7 +193,7 @@ def ceval_for_cdataset(cobject, userflags=None, format="MaskedArray", deep=None,
         #   else : read the data, create a cache file for that, and recurse
         #
         # First go to derived variable evaluation if applicable
-        if operators.is_derived_variable(ds.variable, ds.project):
+        if is_derived_variable(ds.variable, ds.project):
             if ds.variable in derived_list:
                 raise Climaf_Driver_Error("Loop detected while evaluating"
                                           "derived variable " + ds.variable + " " + repr(derived_list))
@@ -599,7 +599,7 @@ def ceval(cobject, userflags=None, format="MaskedArray",
             [repr(x) for x in get_variable("graphic_formats")]))
     #
     if userflags is None:
-        userflags = operators.scriptFlags()
+        userflags = scriptFlags()
     #
     # Next check is too crude for dealing with use of operator 'select'
     # if cobject.crs in recurse_list :
@@ -837,13 +837,13 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
     tim1 = time.time()
     clogger.info("Launching command:" + template)
     #
-    logfile = open(logdir + '/last.out', 'w')
-    logfile.write("\n\nstdout and stderr of script call :\n\t " + template + "\n\n")
-    try:
-        subprocess.check_call(template, stdout=logfile, stderr=subprocess.STDOUT, shell=True)
-    except subprocess.CalledProcessError as inst:
-        logfile.close()
-        raise Climaf_Driver_Error("Something went wrong - Type 'cerr()' for details")
+    with open(get_variable("logdir") + "/last.out", "w") as logfile:
+        logfile.write("\n\nstdout and stderr of script call :\n\t " + template + "\n\n")
+        try:
+            subprocess.check_call(template, stdout=logfile, stderr=subprocess.STDOUT, shell=True)
+        except subprocess.CalledProcessError as inst:
+            logfile.close()
+            raise Climaf_Driver_Error("Something went wrong - Type 'cerr()' for details")
 
     logfile.close()
     #
@@ -862,7 +862,7 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
                 os.system("rm -f " + ll)
     # Handle ouptuts
     if script.outputFormat == "txt":
-        with open(logdir + "/last.out", 'r') as f:
+        with open(get_variable("logdir") + "/last.out", 'r') as f:
             for line in f.readlines():
                 sys.stdout.write(line)
     if script.outputFormat in get_variable("none_formats"):
@@ -882,7 +882,7 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
         return subdict["out_final"]  # main_output_filename
     else:
         raise Climaf_Driver_Error("Some output missing when executing "
-                                  ": %s. \n See %s/last.out" % (template, logdir))
+                                  ": %s. \n See %s/last.out" % (template, get_variable("logdir")))
 
 
 def timePeriod(cobject):
@@ -978,13 +978,13 @@ def cview(datafile):
 def derive_variable(ds):
     """ Assuming that variable of DS is a derived variable, returns the CliMAF object
     representing the operation needed to compute it (using information in dict
-    operators.derived_variable
+    operators_derive.derived_variable
     """
     if not isinstance(ds, classes.cdataset):
         raise Climaf_Driver_Error("arg is not a dataset")
-    if not operators.is_derived_variable(ds.variable, ds.project):
+    if not is_derived_variable(ds.variable, ds.project):
         raise Climaf_Driver_Error("%s is not a derived variable" % ds.variable)
-    op, outname, inVarNames, params = operators.derived_variable(ds.variable, ds.project)
+    op, outname, inVarNames, params = derived_variable(ds.variable, ds.project)
     inVars = []
     for varname in inVarNames:
         dic = ds.kvp.copy()
@@ -994,7 +994,7 @@ def derive_variable(ds):
     if outname == "out":
         rep = father
     else:
-        rep = scriptChild(father, outname)
+        rep = classes.scriptChild(father, outname)
     rep.variable = ds.variable
     return rep
 
@@ -1213,7 +1213,7 @@ def cimport(cobject, crs):
     if isinstance(cobject, numpy.ma.MaskedArray):
         clogger.debug("for now, use a file for importing - should revisit - TBD")
         clogger.error("not yet implemented fro Masked Arrays - TBD")
-    elif isinstance(cobject, str):
+    elif isinstance(cobject, string_types):
         cache.register(cobject, crs)
     else:
         clogger.error("argument is not a Masked Array nor a filename", cobject)
@@ -1419,7 +1419,7 @@ def calias(project, variable, fileVariable=None, **kwargs):
         list_variable = variable.split(",")
 
         for v in list_variable:
-            operators.derive(project, v, 'ccdo', variable, operator='selname,%s' % v)
+            derive(project, v, 'ccdo', variable, operator='selname,%s' % v)
             classes.calias(project=project, variable=v, fileVariable=None, **kwargs)
 
 

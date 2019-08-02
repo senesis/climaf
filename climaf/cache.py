@@ -20,6 +20,7 @@ import pickle
 import uuid
 import hashlib
 from operator import itemgetter
+import six
 
 from climaf import version
 from climaf.utils import Climaf_Cache_Error
@@ -410,7 +411,7 @@ def cdrop(obj, rm=True, force=False):
         crs = repr(obj)
         if isinstance(obj, cdataset):
             crs = "select(" + crs + ")"
-    elif type(obj) is str:
+    elif isinstance(obj, six.string_types):
         crs = obj
     else:
         clogger.error("%s is not a CliMAF object" % repr(obj))
@@ -455,7 +456,7 @@ def cprotect(obj, stop=False):
         crs = repr(obj)
         if isinstance(obj, cdataset):
             crs = "select(" + crs + ")"
-    elif type(obj) is str:
+    elif isinstance(obj, six.string_types):
         crs = obj
     else:
         clogger.error("%s is not a CliMAF object" % repr(obj))
@@ -521,7 +522,7 @@ def csync(update=False):
     fn = os.path.expanduser(cacheIndexFileName)
     try:
         with open(fn, "w") as cacheIndexFile:
-            pickle.dump(crs2filename, cacheIndexFile)
+            pickle.dump(crs2filename, cacheIndexFile, protocol=2) # Used for python 2 compatibility
         dropped_crs = []
     except:
         if update:
