@@ -273,39 +273,39 @@ for pathfilename in filenames_list:
         x = np.array(range(1, 13))
         datevar = []
     else:
-      try :
-        t_cal = dat.variables[tname].calendar
-      except AttributeError : # Attribute doesn't exist
-        t_cal = u"gregorian" # or standard
-      #
-      #
-      tvalue = num2date(nctime, units = t_unit, calendar = t_cal)
-      datevar = []
-      for elt in tvalue:
-          if not isinstance(elt, datetime.datetime):
-             if isinstance(elt, netcdftime._netcdftime.DatetimeNoLeap) or \
-                     isinstance(elt, netcdftime._netcdftime.Datetime360Day):
-                strdate = str.split(elt.strftime(),' ')[0]
-                year  = int(str.split(strdate,'-')[0])
-                month = int(str.split(strdate,'-')[1])
-                day   = int(str.split(strdate,'-')[2])
-                datevar.append(datetime.datetime(year, month, day))
-          else:
-             datevar.append(elt)
-      #cdftime = netcdftime.utime(t_unit, calendar=t_cal)#
-      #, calendar=u"gregorian")
-      # -- Garde-fou calendar
-      #if not isinstance(cdftime.num2date(nctime)[0], datetime.datetime):
-      #   if isinstance(cdftime.num2date(nctime)[0], netcdftime._netcdftime.DatetimeNoLeap):
-      #
-      #   else:
-      #      cdftime = netcdftime.utime(t_unit, calendar=u"gregorian")
-      #datevar.append(cdftime.num2date(nctime))
-      print('datevar = ',datevar)
-      #
-      x = np.array(datevar)
-      #x = np.array(datevar)[0,:]
-    #y = test_dat[:,0,0]
+        try:
+            t_cal = dat.variables[tname].calendar
+        except AttributeError:  # Attribute doesn't exist
+            t_cal = u"gregorian"  # or standard
+        #
+        #
+        tvalue = num2date(nctime, units=t_unit, calendar=t_cal)
+        datevar = []
+        for elt in tvalue:
+            if not isinstance(elt, datetime.datetime):
+                if isinstance(elt, netcdftime._netcdftime.DatetimeNoLeap) or \
+                        isinstance(elt, netcdftime._netcdftime.Datetime360Day):
+                    strdate = str.split(elt.strftime(), ' ')[0]
+                    year = int(str.split(strdate, '-')[0])
+                    month = int(str.split(strdate, '-')[1])
+                    day = int(str.split(strdate, '-')[2])
+                    datevar.append(datetime.datetime(year, month, day))
+            else:
+                datevar.append(elt)
+        # cdftime = netcdftime.utime(t_unit, calendar=t_cal)#
+        # , calendar=u"gregorian")
+        # -- Garde-fou calendar
+        # if not isinstance(cdftime.num2date(nctime)[0], datetime.datetime):
+        #   if isinstance(cdftime.num2date(nctime)[0], netcdftime._netcdftime.DatetimeNoLeap):
+        #
+        #   else:
+        #      cdftime = netcdftime.utime(t_unit, calendar=u"gregorian")
+        # datevar.append(cdftime.num2date(nctime))
+        print('datevar = ', datevar)
+        #
+        x = np.array(datevar)
+        # x = np.array(datevar)[0,:]
+    # y = test_dat[:,0,0]
     y = np.squeeze(test_dat)
     if len(y.shape) > 1:
         print("input data is not 1D")
@@ -522,7 +522,7 @@ if args.text:
                  color=text_colors_list[text_ind],
                  verticalalignment=text_verticalalignment_list[text_ind],
                  horizontalalignment=text_horizontalalignment_list[text_ind]
-                )
+                 )
 
 # -- Control margins
 left_margin = (args.left_margin if args.left_margin else '0.1')

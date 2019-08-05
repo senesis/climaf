@@ -28,7 +28,6 @@ from climaf.period import init_period, sort_periods_list
 from climaf.netcdfbasics import fileHasVar
 from climaf.clogging import clogger
 
-
 locs = []
 
 
@@ -379,39 +378,39 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
 
     - On boucle sur les patterns de la liste url :
 
-      - Instancier le pattern par les valeurs des facettes fournies, et par  ".*" pour $PERIOD
+        - Instancier le pattern par les valeurs des facettes fournies, et par  ".*" pour $PERIOD
 
-      - on fait glob.glob
+        - on fait glob.glob
 
-      - on affine : on ne retient que les valeurs qui matchent avec la regexp de périodes (sous
-        réserve que le pattern contienne $PERIOD) si on n'a rien, on essaie aussi
-        avec filenameVar; d'où une liste de fichiers lfiles
+        - on affine : on ne retient que les valeurs qui matchent avec la regexp de périodes (sous
+          réserve que le pattern contienne $PERIOD) si on n'a rien, on essaie aussi
+          avec filenameVar; d'où une liste de fichiers lfiles
 
-      - on cherche a connaitre les valeurs rencontrées pour chaque facette : on construit
-        une expression régulière (avec groupes) qui capture les valeurs de facettes
-        (y/c PERIOD) et une autre pour capturer la date seulement (est-ce bien encore
-        nécessaire ???)
+        - on cherche a connaitre les valeurs rencontrées pour chaque facette : on construit
+          une expression régulière (avec groupes) qui capture les valeurs de facettes
+          (y/c PERIOD) et une autre pour capturer la date seulement (est-ce bien encore
+          nécessaire ???)
 
         - Boucle sur les fichiers de lfiles:
 
-          - si le pattern n'indique pas qu'on peut extraire la date,
+            - si le pattern n'indique pas qu'on peut extraire la date,
 
-    	     - si la frequence indique un champ fixe, on retient le fichier;
+                - si la frequence indique un champ fixe, on retient le fichier;
 
-	     - sinon , on le retient aussi sans filtrer sur la période
+                - sinon , on le retient aussi sans filtrer sur la période
 
-          - si oui,
+            - si oui,
 
-	     - on extrait la periode
+                - on extrait la periode
 
-	     - si elle convient (divers cas ...)
+                - si elle convient (divers cas ...)
 
-	       - si on a pu filtrer sur la variable,
-	         ou que variable="*" ou variable multiple,
-	         ou que le fichier contient la bonne variable, eventuellement après renommage
-  	         on retient le fichier
+                - si on a pu filtrer sur la variable,
+                    ou que variable="*" ou variable multiple,
+                    ou que le fichier contient la bonne variable, eventuellement après renommage
+                    on retient le fichier
 
-        - A chaque fois qu'on retient un fichier , on ajoute au dict wildcard_facets les valeurs recontrées pour les attributs
+            - A chaque fois qu'on retient un fichier , on ajoute au dict wildcard_facets les valeurs recontrées pour les attributs
 
         - Dès qu'un pattern de la  liste url a eu des fichiers qui collent, on abandonne l'examen des patterns suivants
 
@@ -583,7 +582,7 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
         #
         # Construct regexp for extracting dates from filename
         date_regexp = None
-        template_toreg = template.replace("*", ".*").replace("?", r".").replace("+", "\+")
+        template_toreg = template.replace(r"*", r".*").replace(r"?", r".").replace(r"+", r"\+")
         # print "template before searching dates : "+template_toreg
         for key in date_regexp_keywords:
             # print "searchin "+key+" in "+template
@@ -1051,8 +1050,8 @@ def selectCmip5DrsFiles(urls, **kwargs):
         for p in totry:
             pattern1 = l + "/" + project + "/" + p + "*/" + model  # one * for modelling center
             joker_version = "*"
-            patternv = pattern1 + "/" + experiment + "/" + freqd + "/" + realm + "/" + table + "/" + simulation + "/" + \
-                       joker_version + "/" + variable
+            patternv = pattern1 + "/" + experiment + "/" + freqd + "/" + realm + "/" + table + "/" + simulation + "/" \
+                       + joker_version + "/" + variable
             if len(glob.glob(patternv)) > 0:
                 break
         patternv = pattern1 + "/" + experiment + "/" + freqd + "/" + realm + "/" + table + "/" + simulation

@@ -181,10 +181,10 @@ for host, username in host_user2:
                     local_file_ut_datetime = local_file_datetime.replace(tzinfo=tz.tzlocal()).astimezone(
                         tz.gettz('UTC'))
                     if time.mktime(local_file_ut_datetime.timetuple()) >= remote_timestamp:
-                        print('Most recent file found in cache: %s is at %s \n' % \
+                        print('Most recent file found in cache: %s is at %s \n' %
                               (ffile, os.path.expanduser(remote_cachedir) + '/' + host + ffile))
                     else:
-                        print('File found in cache %s is older than %s \n' % \
+                        print('File found in cache %s is older than %s \n' %
                               (os.path.expanduser(remote_cachedir) + '/' + host + ffile, ffile))
                         filetransfer = True
                 #                        connect.retrbinary('RETR '+filename, open(os.path.expanduser(remote_cachedir)+

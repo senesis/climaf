@@ -319,7 +319,8 @@ class cscript():
                                  canMissing, commuteWithEnsemble, commuteWithTimeConcatenation,
                                  commuteWithSpaceConcatenation)
         graphic_formats = get_variable("graphic_formats")
-        if format in get_variable("known_formats") or format in graphic_formats or format in get_variable("none_formats"):
+        if format in get_variable("known_formats") or \
+                format in graphic_formats or format in get_variable("none_formats"):
             self.outputFormat = format
         else:
             raise Climaf_Operator_Error(

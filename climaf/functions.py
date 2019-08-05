@@ -55,7 +55,7 @@ def fmul(dat1, dat2):
       >>> c = '-1'  #a constant
       >>> ds1_times_c = fmul(ds1,c) # ds1 * c
     """
-    if isinstance(dat2, string_types + [int,]):
+    if isinstance(dat2, string_types + [int, ]):
         c = str(float(dat2))
         return ccdo(dat1, operator='mulc,' + c)
     else:
@@ -261,6 +261,7 @@ def annual_cycle(dat):
 
     """
     return ccdo(dat, operator="ymonavg")
+
 
 def annual_cycle_fast(dat):
     """
@@ -476,7 +477,6 @@ def clim_average_fast(dat, season):
             avg = ccdo_fast(scyc, operator='timmin')
     #
     return avg
-
 
 
 def summary(dat):

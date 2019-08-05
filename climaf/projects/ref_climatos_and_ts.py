@@ -59,12 +59,12 @@ if atTGCC:
 if atIDRIS:
     root = "/workgpfs/rech/psl/rpsl035/IGCM/ReferenceDatasets/"
 if atCerfacs:
-    root="/data/scratch/globc/dcom/CMIP6_TOOLS/ReferenceDatasets_CESMEP/"
+    root = "/data/scratch/globc/dcom/CMIP6_TOOLS/ReferenceDatasets_CESMEP/"
 if atCNRM:
     root = "/cnrm/est/COMMON/climaf/reference_datasets_from_IPSL/"
 
-cproject('ref_climatos', ('frequency', 'annual_cycle'), 'product', 'clim_period', 'clim_period_begin', 'clim_period_end', 'table', 'obs_type',
-         ensemble=['product'], separator='%')
+cproject('ref_climatos', ('frequency', 'annual_cycle'), 'product', 'clim_period', 'clim_period_begin',
+         'clim_period_end', 'table', 'obs_type', ensemble=['product'], separator='%')
 cfreqs('ref_climatos', {'monthly': 'mo', 'daily': 'day', 'seasonal': 'mo', 'annual_cycle': 'mo', 'yearly': 'yr'})
 
 cdef('variable', '*', project='ref_climatos')

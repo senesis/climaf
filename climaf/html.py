@@ -235,7 +235,7 @@ def cell(label, filename=None, thumbnail=None, hover=True, dirname=None, altdir=
         if filename:
             tmpfilename, filextension = os.path.splitext(os.path.basename(filename))
 
-            regex = re.compile('([a-z]+)\_([a-z]+)([0-9]+)')
+            regex = re.compile(r'([a-z]+)\_([a-z]+)([0-9]+)')
             # !!! # -- Make a new nb that is unique to avoid the issues with images
             #          in the cache of the browser
             from datetime import datetime
@@ -263,7 +263,7 @@ def cell(label, filename=None, thumbnail=None, hover=True, dirname=None, altdir=
                 tt.update(index_dict)
             # -- Save the file
             with open(os.path.expanduser(index_atlas), "wb") as atlas_index_w:
-                pickle.dump(tt, atlas_index_w, protocol=2) # Used for python 2 compatibility
+                pickle.dump(tt, atlas_index_w, protocol=2)  # Used for python 2 compatibility
 
             return '<TD ALIGN=RIGHT>' + \
                    link(label, "climaf_atlas" + str(nb) + filextension, thumbnail, hover) + \
@@ -541,8 +541,7 @@ def start_line(title):
     return tmpindex
 
 
-
-def safe_mode_cfile_plot(myplot,do_cfile=True,safe_mode=True):
+def safe_mode_cfile_plot(myplot, do_cfile=True, safe_mode=True):
     # Need to create cachedir if it does not exist yet
     if not os.path.isdir(cachedir):
         os.makedirs(cachedir)
@@ -551,26 +550,23 @@ def safe_mode_cfile_plot(myplot,do_cfile=True,safe_mode=True):
         shutil.copy(cpath[0] + '/plot/Empty.png', cachedir)
 
     if not do_cfile:
-       return myplot
-       #
+        return myplot
+        #
     else:
-       # -- We try to 'cfile' the plot
-       if not safe_mode:
-          print('-- plot function is not in safe mode --')
-          return cfile(myplot)
-       else:
-          try:
-             plot_filename = cfile(myplot)
-             print('--> Successfully plotted ',myplot)
-             return plot_filename
-          except:
-             # -- In case it didn't work, we try to see if it comes from the availability of the data
-             print('!! Plotting failed ',myplot)
-             print("set clog('debug') and safe_mode=False to identify where the plotting failed")
-             return blank_cell
-
-
-
+        # -- We try to 'cfile' the plot
+        if not safe_mode:
+            print('-- plot function is not in safe mode --')
+            return cfile(myplot)
+        else:
+            try:
+                plot_filename = cfile(myplot)
+                print('--> Successfully plotted ', myplot)
+                return plot_filename
+            except:
+                # -- In case it didn't work, we try to see if it comes from the availability of the data
+                print('!! Plotting failed ', myplot)
+                print("set clog('debug') and safe_mode=False to identify where the plotting failed")
+                return blank_cell
 
 
 class Climaf_Html_Error(Exception):
