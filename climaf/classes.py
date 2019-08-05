@@ -25,7 +25,7 @@ from climaf.clogging import clogger
 from climaf.netcdfbasics import fileHasVar, varsOfFile, timeLimits, model_id
 
 
-class cproject():
+class cproject(object):
     def __init__(self, name, *args, **kwargs):
         """
         Declare a project and its facets/attributes in CliMAF (see below)
@@ -196,7 +196,7 @@ cdef("domain", "global")
 cobjects = dict()
 
 
-class cobject():
+class cobject(object):
     def __init__(self):
         # crs is the string expression defining the object
         # in the CLIMAF Reference Syntax
@@ -316,7 +316,7 @@ def processDatasetArgs(**kwargs):
             errmsg += " " + e
     if errmsg != "":
         raise Climaf_Classes_Error(errmsg)
-    if 'period' in attval and not isinstance(attval['period'], cperiod) and attval['period'] not in ["*",]:
+    if 'period' in attval and not isinstance(attval['period'], cperiod) and attval['period'] not in ["*", ]:
         Climaf_Classes_Error("at end of  process.. : period is not a cperiod")
     return attval
 
@@ -922,7 +922,7 @@ class cdataset(cobject):
 
                 if 'cell_methods' in fileobj.variables[var].__dict__:  # time mean
 
-                    regex = re.compile('.*time *: *mean *\(? *interval *: *([0-9]+.?[0-9]+?) ([a-zA-Z]+) *\)')
+                    regex = re.compile(r'.*time *: *mean *\(? *interval *: *([0-9]+.?[0-9]+?) ([a-zA-Z]+) *\)')
                     cell_meth_att = regex.search(fileobj.variables[var].cell_methods)
                     if cell_meth_att:
                         if cell_meth_att.group(2) == 'hours':
@@ -1802,7 +1802,7 @@ class cpage(cobject):
             nx, ny = 2, 3
         elif n in range(7, 9):
             nx, ny = 2, 4
-        elif n in range(9,13):
+        elif n in range(9, 13):
             nx, ny = 3, 4
         elif n in range(13, 16):
             nx, ny = 3, 5

@@ -31,7 +31,7 @@ from climaf.clogging import clogger
 locs = []
 
 
-class dataloc():
+class dataloc(object):
     def __init__(self, project="*", organization='generic', url=None, model="*", simulation="*",
                  realm="*", table="*", frequency="*"):
         """
@@ -1050,11 +1050,10 @@ def selectCmip5DrsFiles(urls, **kwargs):
         for p in totry:
             pattern1 = l + "/" + project + "/" + p + "*/" + model  # one * for modelling center
             joker_version = "*"
-            patternv = pattern1 + "/" + experiment + "/" + freqd + "/" + realm + "/" + table + "/" + simulation + "/" \
-                       + joker_version + "/" + variable
+            patternv = "/".join([pattern1, experiment, freqd, realm, table, simulation, joker_version, variable])
             if len(glob.glob(patternv)) > 0:
                 break
-        patternv = pattern1 + "/" + experiment + "/" + freqd + "/" + realm + "/" + table + "/" + simulation
+        patternv = "/".join([pattern1, experiment, freqd, realm, table, simulation])
         # Get version directories list
         ldirs = glob.glob(patternv)
         clogger.debug("Globbing with " + patternv + " gives:" + repr(ldirs))
@@ -1072,7 +1071,7 @@ def selectCmip5DrsFiles(urls, **kwargs):
                     else:
                         cversion = lversions[-1]  # Assume that order provided by sort() is OK
             # print "using version "+cversion+" for requested version: "+version
-            lfiles = glob.glob(repert + "/" + cversion + "/" + variable + "/*.nc")
+            lfiles = glob.glob("/".join([repert, cversion, variable, r"*.nc"]))
             # print "listing "+repert+"/"+cversion+"/"+variable+"/*.nc"
             # print 'lfiles='+`lfiles`
             for f in lfiles:

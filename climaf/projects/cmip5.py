@@ -104,7 +104,7 @@ if root:
     for var in ['tas', 'tasmax', 'tasmin', 'pr', 'rsds', 'sfcWind']:
         calias('CMIP5-Adjust', var, var + 'Adjust')
 
-    cdef('root', '/prodigfs/project' , project='CMIP5-Adjust')
+    cdef('root', '/prodigfs/project', project='CMIP5-Adjust')
     # cdef('institute'      , '*'           , project='CMIP5-Adjust')
     cdef('table', '*', project='CMIP5-Adjust')  # impossible, because of ambiguities
     cdef('realm', '*', project='CMIP5-Adjust')  # impossible, because of ambiguities

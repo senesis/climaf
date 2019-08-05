@@ -233,7 +233,7 @@ def register(filename, crs, outfilename=None):
                         dropped_crs.remove(crs)
                     return True
                 else:
-                    clogger.critical("cannot move by" % cmd)
+                    clogger.critical("cannot move by %s" % cmd)
                     exit()
                     return None
             else:
@@ -522,11 +522,11 @@ def csync(update=False):
     fn = os.path.expanduser(cacheIndexFileName)
     try:
         with open(fn, "w") as cacheIndexFile:
-            pickle.dump(crs2filename, cacheIndexFile, protocol=2) # Used for python 2 compatibility
+            pickle.dump(crs2filename, cacheIndexFile, protocol=2)  # Used for python 2 compatibility
         dropped_crs = []
     except:
         if update:
-            if os.path.isfile(fn) and len(files_in_cache>0):
+            if os.path.isfile(fn) and len(files_in_cache > 0):
                 clogger.error("Issue when writing cache index %s" % fn)
 
 
@@ -561,7 +561,7 @@ def cload(alt=None):
                 # print "evaluating crs="+crs
                 eval(crs, sys.modules['__main__'].__dict__)
             except:
-                print ("Inconsistent cache object is skipped : %s" % crs)
+                print("Inconsistent cache object is skipped : %s" % crs)
                 # clogger.debug("Inconsistent cache object is skipped : %s"%crs)
                 p = guess_projects(crs)
                 if p not in crs_not_yet_evaluable:

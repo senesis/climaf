@@ -28,7 +28,7 @@ from climaf.driver import capply
 internals = []
 
 
-class cscript():
+class cscript(object):
     def __init__(self, name, command, format="nc", canOpendap=False,
                  commuteWithTimeConcatenation=False, commuteWithSpaceConcatenation=False,
                  canSelectVar=False, **kwargs):
@@ -403,7 +403,7 @@ def fixed_fields(operator, *paths):
     change_variable("scripts", scripts)
 
 
-class coperator():
+class coperator(object):
     def __init__(self, op, command, canOpendap=False, canSelectVar=False,
                  canSelectTime=False, canSelectDomain=False, canAggregateTime=False,
                  canAlias=False, canMissing=False, commuteWithEnsemble=False):

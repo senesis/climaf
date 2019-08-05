@@ -7,7 +7,7 @@ CliMAF scripts operators tools.
 from __future__ import print_function, division, unicode_literals, absolute_import
 
 
-class scriptFlags():
+class scriptFlags(object):
     def __init__(self, canOpendap=False, canSelectVar=False,
                  canSelectTime=False, canSelectDomain=False,
                  canAggregateTime=False, canAlias=False,

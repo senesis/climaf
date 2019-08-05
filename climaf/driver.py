@@ -1102,7 +1102,8 @@ def cfile(object, target=None, ln=None, hard=None, deep=None):
     #
     end_time = datetime.now()
     duration = end_time - start_time
-    clogger.debug("cfile completed at: "+end_time.strftime("%Y-%m-%d %H:%M:%S")+" : total duration = "+str(duration.total_seconds())+' seconds')
+    clogger.debug("cfile completed at: " + end_time.strftime("%Y-%m-%d %H:%M:%S") + " : total duration = " +
+                  str(duration.total_seconds())+' seconds')
     if target is None:
         return result
     else:
@@ -1348,7 +1349,7 @@ def cfilePage_pdf(cobj, deep, recurse_list=None):
     page_size = "{%dpx,%dpx}" % (cobj.page_width, cobj.page_height)
     fig_nb = "%dx%d" % (len(cobj.fig_lines[0]), len(cobj.fig_lines))
     fig_delta = "%d %d" % (xmargin, ymargin)
-    preamb = "\pagestyle{empty} \\usepackage{hyperref} \\usepackage{graphicx} \\usepackage{geometry} " \
+    preamb = r"\pagestyle{empty} \\usepackage{hyperref} \\usepackage{graphicx} \\usepackage{geometry} " \
              "\\geometry{vmargin=%dcm,hmargin=2cm}" % cobj.y
 
     args = ["pdfjam", "--keepinfo", "--preamble", preamb, "--papersize", page_size, "--delta", fig_delta, "--nup",
@@ -1378,11 +1379,11 @@ def cfilePage_pdf(cobj, deep, recurse_list=None):
             pt = cobj.pt
 
         if cobj.titlebox:
-            latex_command = "\\begin{center} \\hspace{%dcm} \\setlength{\\fboxrule}{0.5pt} " \
-                            "\\setlength{\\fboxsep}{2mm} \\fcolorbox{black}{%s}{\%s{\\fontfamily{%s}\\selectfont %s}}" \
-                            " \\end{center}" % (cobj.x, cobj.background, pt, cobj.font, cobj.title)
+            latex_command = r"\\begin{center} \\hspace{%dcm} \\setlength{\\fboxrule}{0.5pt} " \
+                            r"\\setlength{\\fboxsep}{2mm} \\fcolorbox{black}{%s}{\%s{\\fontfamily{%s}\\selectfont %s}}"\
+                            r" \\end{center}" % (cobj.x, cobj.background, pt, cobj.font, cobj.title)
         else:
-            latex_command = "\\begin{center} \\hspace{%dcm} \%s{\\fontfamily{%s}\\selectfont %s} \\end{center}" \
+            latex_command = r"\\begin{center} \\hspace{%dcm} \%s{\\fontfamily{%s}\\selectfont %s} \\end{center}" \
                             % (cobj.x, pt, cobj.font, cobj.title)
         args.extend(["--pagecommand", latex_command])
 
