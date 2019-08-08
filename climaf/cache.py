@@ -16,6 +16,7 @@ import os
 import os.path
 import re
 import time
+import glob
 import pickle
 import uuid
 import hashlib
@@ -134,8 +135,8 @@ def generateUniqueFileName_safe(expression, operator=None, format="nc"):
         clogger.debug("must skip %s which CRS is %s" % (existing, getCRS(existing)))
         number += 2
         if number >= len(full):
-            clogger.critical("Critical issue in cache : " + len(full) + " digits is not enough for " + expression)
-            exit()
+            clogger.critical("Critical issue in cache : " + str(len(full)) + " digits is not enough for " + expression)
+            raise Climaf_Cache_Error("Critical issue in cache : " + str(len(full)) + " digits is not enough for " + expression)
         guess = full[0: number - 1]
         existing = searchFile(prefix + stringToPath(guess, directoryNameLength) + "." + format)
         if existing:
@@ -995,3 +996,11 @@ def rebuild():
     return crs2filename
 
 
+class Climaf_Cache_Error(Exception):
+    def __init__(self, valeur):
+        self.valeur = valeur
+        clogger.error(self.__str__())
+        dedent(100)
+
+    def __str__(self):
+        return repr(self.valeur)
