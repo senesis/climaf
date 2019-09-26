@@ -30,3 +30,16 @@ class scriptFlags(object):
         self.canSelectDomain = False
         self.canAlias = False
         self.canMissing = False
+
+    def __eq__(self, other):
+        return isinstance(other, scriptFlags) and \
+               (self.canOpendap == other.canOpendap) and \
+               (self.canSelectVar == other.canSelectVar) and \
+               (self.canSelectTime == other.canSelectTime) and \
+               (self.canSelectDomain == other.canSelectDomain) and \
+               (self.canAggregateTime == other.canAggregateTime) and \
+               (self.canAlias == other.canAlias) and \
+               (self.canMissing == other.canMissing) and \
+               (self.commuteWithEnsemble == other.commuteWithEnsemble) and \
+               (self.commuteWithTimeConcatenation == other.commuteWithTimeConcatenation) and \
+               (self.commuteWithSpaceConcatenation == other.commuteWithSpaceConcatenation)
