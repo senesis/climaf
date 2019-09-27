@@ -321,13 +321,19 @@ def line(list_of_pairs, title="", thumbnail=None, hover=True, dirname=None, altd
 
     for e in list_of_pairs:
         if isinstance(e, tuple):
+            if not isinstance(e[0], six.string_types):
+                raise TypeError("Unknown object type for a label %s" % e[0])
+            if not isinstance(e[1], six.string_types):
+                raise TypeError("Unknown object type for a label %s" % e[1])
             label = e[0]
             labels.append(label)
             figures.append(e[1])
-        else:
+        elif isinstance(e, six.string_types):
             label = e
             labels.append(e)
             figures.append(None)
+        else:
+            raise TypeError("Unknown object type for a label %s" % e)
     rep = open_line() + title
     for lab, fig in zip(labels, figures):
         rep += cell(lab, fig, thumbnail, hover, dirname, altdir)

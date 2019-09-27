@@ -204,10 +204,10 @@ class cobject(object):
 
     def __str__(self):
         # return "Climaf object : "+self.crs
-        return self.buildcrs()
+        return str(self.buildcrs())
 
     def __repr__(self):
-        return self.buildcrs()
+        return str(self.buildcrs())
 
     def register(self):
         pass
@@ -231,7 +231,7 @@ class cdummy(cobject):
         pass
 
     def buildcrs(self, period=None, crsrewrite=None):
-        return 'ARG'
+        return str('ARG')
 
 
 def processDatasetArgs(**kwargs):
@@ -288,7 +288,7 @@ def processDatasetArgs(**kwargs):
             attval['simulation'] = 'r0i0p0'
             attval['frequency'] = 'fx'
     # Special processing for CMIP6  : facet 'simulation' is forbidden (must use 'realization')
-    if (attval['project'] == 'CMIP6') and 'simulation' in kwargs and kwargs['simulation'] is not '':
+    if (attval['project'] == 'CMIP6') and 'simulation' in kwargs and kwargs['simulation'] != '':
         raise Climaf_Classes_Error("You cannot use attribute 'simulation' in CMIP6; please use 'realization'. "
                                    "This if for kwargs=%s" % repr(kwargs))
 
@@ -429,7 +429,7 @@ class cdataset(cobject):
         if isinstance(dic['domain'], list):
             dic['domain'] = repr(dic['domain'])
         rep = "ds('%s')" % crs_template.safe_substitute(dic)
-        return rep
+        return str(rep)
 
     def errata(self):
         if self.project == "CMIP6":
@@ -1118,7 +1118,7 @@ class cens(cobject, dict):
         rep = rep + "}"
         rep = rep.replace(",}", "}")
         rep = rep + ")"
-        return rep
+        return str(rep)
 
     def check(self):
         """
@@ -1331,10 +1331,13 @@ class ctree(cobject):
         clefs = self.parameters.keys()
         for par in sorted(list(clefs)):
             if par != 'member_label':
-                rep += par + "=" + repr(self.parameters[par]) + ","
+                if isinstance(self.parameters[par], six.string_types):
+                    rep += "%s='%s'," % (par, str(self.parameters[par]))
+                else:
+                    rep += "%s=%s," % (par, repr(self.parameters[par]))
         rep += ")"
         rep = rep.replace(",)", ")")
-        return rep
+        return str(rep)
 
     def setperiod(self, period):
         """ modifies the period for all datasets of a tree"""
@@ -1367,7 +1370,7 @@ class scriptChild(cobject):
         tmp = self.father.buildcrs(period=period)
         if crsrewrite:
             tmp = crsrewrite(tmp)
-        return tmp + "." + self.varname
+        return str(tmp + "." + self.varname)
 
 
 def compare_trees(tree1, tree2, func, filter_on_operator=None):
@@ -1849,7 +1852,7 @@ class cpage(cobject):
         rep = rep.replace(",]", "]")
         rep = rep.replace(", ]", "]")
 
-        return rep
+        return str(rep)
 
 
 class cpage_pdf(cobject):
@@ -2022,7 +2025,7 @@ class cpage_pdf(cobject):
         rep = rep.replace(",]", "]")
         rep = rep.replace(", ]", "]")
 
-        return rep
+        return str(rep)
 
 
 def guess_projects(crs):

@@ -27,7 +27,7 @@ from climaf import version
 from climaf.utils import Climaf_Cache_Error
 from .classes import compare_trees, cobject, cdataset, guess_projects, allow_error_on_ds
 from .cmacro import crewrite
-from .clogging import clogger
+from .clogging import clogger, dedent
 from climaf.environment import get_variable
 
 currentCache = None
