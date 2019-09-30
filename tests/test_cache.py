@@ -106,7 +106,15 @@ class RenameTests(unittest.TestCase):
     @unittest.skipUnless(False, "The test is not written")
     def test_rename(self):
         # TODO: Implement the tests for this function
-        pass
+        a_file = cfile(ds())
+        new_crs = ""
+        new_file = generateUniqueFileName(new_crs, format="nc")
+        from climaf.cache import crs2filename
+        self.assertIn(a_file, crs2filename)
+        self.assertEqual(rename(a_file, new_crs))
+        self.assertNotIn(a_file, crs2filename)
+        self.assertIn(new_file, crs2filename)
+        self.assertTrue(os.path.exists(new_file))
 
 
 class HasMatchingObjectTests(unittest.TestCase):
