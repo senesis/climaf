@@ -481,7 +481,7 @@ def clim_average_fast(dat, season):
 
 def summary(dat):
     """
-    Summary provides the informations on a CliMAF dataset or ensemble of datsets
+    Summary provides the informations on a CliMAF dataset or ensemble of datasets
     It displays the path and filenames, and the dictionary of pairs keyword-values
     associated with the dataset.
 
