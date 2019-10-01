@@ -13,8 +13,8 @@ craz()
 january_ta = ds(project='example', simulation="AMIPV6ALB2G", variable="ta", frequency='monthly', period="198001")
 
 # plot map for first level
-map = plot(january_ta, title='January')
-cshow(map)
+map_complete = plot(january_ta, title='January')
+cshow(map_complete)
 # Plot on stereopolar grid
 mapNH = plot(january_ta, title='January', proj="NH", min=240, max=290, delta=5)
 cshow(mapNH)

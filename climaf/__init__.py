@@ -18,7 +18,7 @@ __all__ = ["site_settings", "cache", "classes", "clogging", "dataloc", "driver",
 version = "1.2.12"
 
 
-def tim(string=None):
+def tim(string=None, verbose=False):
     """
     Utility function : print duration since last call
     Init it by a call without arg
@@ -29,7 +29,7 @@ def tim(string=None):
         delta = time.time() - tim.last
         tim.last = time.time()
         # if ("dotiming" in vars() and dotiming) :
-        if False:
+        if verbose:
             print("Duration %.1f for step %s" % (delta, string), file=sys.stderr)
 
 
@@ -104,8 +104,9 @@ if not already_inited and not onrtd:
                   + " => " + ncdump_path)
         else:
             ncdump_path = my_which("ncdump")
-            print("ncdump " + subprocess.check_output([ncdump_path, ],
-                                                      stderr=subprocess.STDOUT).decode("utf-8").split('\n')[-2].split()[3] +
+            print("ncdump " +
+                  subprocess.check_output([ncdump_path, ],
+                                          stderr=subprocess.STDOUT).decode("utf-8").split('\n')[-2].split()[3] +
                   " => " + ncdump_path)
     except:
         print("Warning: ncdump not found -> can't use ncdump from CliMAF")

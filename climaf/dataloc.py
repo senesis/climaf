@@ -23,7 +23,7 @@ from functools import partial
 import six
 
 from climaf.environment import get_variable
-from climaf.utils import Climaf_Error
+from climaf.utils import Climaf_Error, Climaf_Data_Error
 from climaf.period import init_period, sort_periods_list
 from climaf.netcdfbasics import fileHasVar
 from climaf.clogging import clogger
@@ -177,7 +177,7 @@ class dataloc(object):
         #
         self.urls = alt2
         # Register new dataloc only if not already registered
-        if not (any([l == self for l in locs])):
+        if not (any([loc == self for loc in locs])):
             locs.append(self)
 
     def __eq__(self, other):
@@ -947,20 +947,20 @@ def selectEmFiles(**kwargs):
                           repr(command))
             break
         if ex.wait() == 0:
-            dir = ex.stdout.read().split("=")[1].replace('"', "").replace("\n", "")
-            clogger.debug("Looking at dir " + dir)
-            if os.path.exists(dir):
-                lfiles = os.listdir(dir)
+            file_dir = ex.stdout.read().split("=")[1].replace('"', "").replace("\n", "")
+            clogger.debug("Looking at dir " + file_dir)
+            if os.path.exists(file_dir):
+                lfiles = os.listdir(file_dir)
                 for fil in lfiles:
                     # clogger.debug("Looking at file "+fil)
                     fileperiod = periodOfEmFile(fil, realm, f)
                     if fileperiod and period.intersects(fileperiod):
-                        if fileHasVar(dir + "/" + fil, variable):
-                            rep.append(dir + "/" + fil)
+                        if fileHasVar(file_dir + "/" + fil, variable):
+                            rep.append(file_dir + "/" + fil)
                     # clogger.debug("Done with Looking at file "+fil)
             else:
                 clogger.error("Directory %s does not exist for simulation %s, realm %s "
-                              "and frequency %s" % (dir, simulation, realm, f))
+                              "and frequency %s" % (file_dir, simulation, realm, f))
         else:
             clogger.info("No archive location found for " + simulation + " for realm " + realm + " with: " +
                          repr(command))
@@ -1004,17 +1004,17 @@ def selectExampleFiles(urls, **kwargs):
         for l in urls:
             for realm in ["A", "L"]:
                 # dir=l+"/"+realm+"/Origin/Monthly/"+simulation
-                dir = l + "/" + realm
-                clogger.debug("Looking at dir " + dir)
-                if os.path.exists(dir):
-                    lfiles = os.listdir(dir)
+                file_dir = l + "/" + realm
+                clogger.debug("Looking at dir " + file_dir)
+                if os.path.exists(file_dir):
+                    lfiles = os.listdir(file_dir)
                     for f in lfiles:
                         clogger.debug("Looking at file " + f)
                         fileperiod = periodOfEmFile(f, realm, 'mon')
                         if fileperiod and fileperiod.intersects(kwargs['period']):
-                            if fileHasVar(dir + "/" + f, kwargs['variable']):
-                                rep.append(dir + "/" + f)
-                            # else: print "No var ",variable," in file", dir+"/"+f
+                            if fileHasVar(file_dir + "/" + f, kwargs['variable']):
+                                rep.append(file_dir + "/" + f)
+                            # else: print "No var ", variable," in file", file_dir + "/"+f
     return rep
 
 

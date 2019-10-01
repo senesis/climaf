@@ -27,9 +27,9 @@ print(repr(explore))
 
 # Let us play with a multi-variable file (a file which is not CMIP5 compliant -> must provide period)
 multifile = cpath + "/../examples/data/AMIPV6ALB2G/A/AMIPV6ALB2GPL1980.nc"
-all = fds(multifile, period="1980")
-print('variable(s)=', all.variable)
-print('model=', all.model)
+all_files = fds(multifile, period="1980")
+print('variable(s)=', all_files.variable)
+print('model=', all_files.model)
 
 # If you know what you want from the data file
 my_rst = fds(multifile, variable='rst', period='198004')

@@ -35,10 +35,10 @@ def varsOfFile(filename):
     from .anynetcdf import ncf
     lvars = []
     fileobj = ncf(filename, 'r')
-    vars = fileobj.variables
-    if isinstance(vars, dict):
-        vars = list(vars)
-    for filevar in vars:
+    list_vars = fileobj.variables
+    if isinstance(list_vars, dict):
+        list_vars = list(list_vars)
+    for filevar in list_vars:
         if ((filevar not in fileobj.dimensions) and
                 not re.findall("^lat", filevar) and
                 not re.findall("^lon", filevar) and
@@ -61,10 +61,10 @@ def fileHasVar(filename, varname):
     rep = False
     clogger.debug("opening " + filename + " for checkin if has variable " + varname)
     fileobj = ncf(filename)
-    vars = fileobj.variables
-    if isinstance(vars, dict):
-        vars = list(vars)
-    for filevar in vars:
+    list_vars = fileobj.variables
+    if isinstance(list_vars, dict):
+        list_vars = list(list_vars)
+    for filevar in list_vars:
         if filevar == varname:
             rep = True
             break
@@ -81,12 +81,12 @@ def fileHasDim(filename, dimname):
     clogger.debug("opening " + filename + " for checkin if has dimension " + dimname)
     fileobj = ncf(filename)
     dims = fileobj.dimensions
-    vars = fileobj.variables
+    list_vars = fileobj.variables
     if isinstance(dims, dict):
         dims = list(dims)
-    if isinstance(vars, dict):
-        vars = list(vars)
-    dims = dims + vars
+    if isinstance(list_vars, dict):
+        list_vars = list(list_vars)
+    dims = dims + list_vars
     for filedim in dims:
         if filedim == dimname:
             rep = True

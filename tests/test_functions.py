@@ -225,7 +225,6 @@ class ConvertListToStringTests(unittest.TestCase):
 
     def setUp(self):
         def my_conversion_function(elt, separator1=",", separator2="|"):
-            string = ""
             if isinstance(elt, list):
                 new_elt = list()
                 for in_elt in elt:

@@ -56,6 +56,7 @@ class cperiod(object):
             test = False
         return test
     #
+
     def __repr__(self):
         return self.pr()
         # return("%04d%02d%02d%02d%02d-%04d%02d%02d%02d%02d"%(\
@@ -314,11 +315,11 @@ def sort_periods_list(periods_list):
 
 
 def merge_periods(remain_to_merge, already_merged=[]):
-    if already_merged == []:
+    if isinstance(already_merged, list) and len(already_merged) == 0:
         if len(remain_to_merge) < 2:
             return remain_to_merge
-        sorted = sort_periods_list(remain_to_merge)
-        return merge_periods(sorted[1:], [sorted[0]])
+        sorted_periods_list = sort_periods_list(remain_to_merge)
+        return merge_periods(sorted_periods_list[1:], [sorted_periods_list[0]])
     if len(remain_to_merge) > 0:
         last = already_merged[-1]
         next_one = remain_to_merge.pop(0)

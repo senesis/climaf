@@ -28,43 +28,6 @@ from climaf.driver import capply
 internals = []
 
 
-class scriptFlags():
-    def __init__(self, canOpendap=False, canSelectVar=False,
-                 canSelectTime=False, canSelectDomain=False,
-                 canAggregateTime=False, canAlias=False,
-                 canMissing=False, commuteWithEnsemble=True,
-                 commuteWithTimeConcatenation=False, commuteWithSpaceConcatenation=False):
-        self.canOpendap = canOpendap
-        self.canSelectVar = canSelectVar
-        self.canSelectTime = canSelectTime
-        self.canSelectDomain = canSelectDomain
-        self.canAggregateTime = canAggregateTime
-        self.canAlias = canAlias
-        self.canMissing = canMissing
-        self.commuteWithEnsemble = commuteWithEnsemble
-        self.commuteWithTimeConcatenation = commuteWithTimeConcatenation
-        self.commuteWithSpaceConcatenation = commuteWithSpaceConcatenation
-
-    def __eq__(self, other):
-        return isinstance(other, scriptFlags) and \
-               (self.canOpendap == other.canOpendap) and \
-               (self.canSelectVar == other.canSelectVar) and \
-               (self.canSelectTime == other.canSelectTime) and \
-               (self.canSelectDomain == other.canSelectDomain) and \
-               (self.canAggregateTime == other.canAggregateTime) and \
-               (self.canAlias == other.canAlias) and \
-               (self.canMissing == other.canMissing) and \
-               (self.commuteWithEnsemble == other.commuteWithEnsemble) and \
-               (self.commuteWithTimeConcatenation == other.commuteWithTimeConcatenation) and \
-               (self.commuteWithSpaceConcatenation == other.commuteWithSpaceConcatenation)
-
-    def unset_selectors(self):
-        self.canSelectVar = False
-        self.canSelectTime = False
-        self.canSelectDomain = False
-        self.canAlias = False
-        self.canMissing = False
-
 class cscript(object):
     def __init__(self, name, command, format="nc", canOpendap=False,
                  commuteWithTimeConcatenation=False, commuteWithSpaceConcatenation=False,
@@ -265,8 +228,7 @@ class cscript(object):
             scriptcommand = command.split(' ')[0].replace("(", "")
             ex = subprocess.Popen(['which', scriptcommand], stdout=subprocess.PIPE)
             if ex.wait() != 0:
-                raise Climaf_Operator_Error("defining %s : command %s is not "
-                                      "executable" % (name, scriptcommand))
+                raise Climaf_Operator_Error("defining %s : command %s is not executable" % (name, scriptcommand))
             executable = ex.stdout.read().decode("utf-8").replace('\n', '')
             #
             # Analyze inputs field keywords and populate dict
@@ -353,8 +315,8 @@ class cscript(object):
             self.name = name
             self.command = command
             self.fixedfields = None
-            self.flags = scriptFlags(canOpendap, canSelectVar, canSelectTime, canSelectDomain, canAggregateTime, canAlias,
-                                     canMissing, commuteWithEnsemble, commuteWithTimeConcatenation,
+            self.flags = scriptFlags(canOpendap, canSelectVar, canSelectTime, canSelectDomain, canAggregateTime,
+                                     canAlias, canMissing, commuteWithEnsemble, commuteWithTimeConcatenation,
                                      commuteWithSpaceConcatenation)
             graphic_formats = get_variable("graphic_formats")
             if format in get_variable("known_formats") or format in graphic_formats or\
@@ -362,7 +324,8 @@ class cscript(object):
                 self.outputFormat = format
             else:
                 raise Climaf_Operator_Error(
-                    "Allowed formats yet are : 'object', 'nc', 'txt', %s" % ', '.join([repr(x) for x in graphic_formats]))
+                    "Allowed formats yet are : 'object', 'nc', 'txt', %s" % ', '.join([repr(x) for x in
+                                                                                       graphic_formats]))
             scripts[name] = self
             change_variable("scripts", scripts)
 
@@ -393,10 +356,10 @@ class cscript(object):
         of a script which are inputs
 
         """
-        l = re.findall(r"\$\{(mm)?ins?(_\d*)?\}", self.command)
+        list_args = re.findall(r"\$\{(mm)?ins?(_\d*)?\}", self.command)
         ls = []
         old = None
-        for e in l:
+        for e in list_args:
             if e != old:
                 ls.append(e)
             old = e

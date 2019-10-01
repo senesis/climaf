@@ -65,16 +65,16 @@ class CscriptTest(unittest.TestCase):
         # TODO: Modify cscript to avoid creating an instance of the script if not possible
         import sys
         a = sys.modules["__main__"].__dict__["tmp_directory"]
-        my_script = cscript("tmp_directory", "cdo ${operator} ${in} ${out}")
+        cscript("tmp_directory", "cdo ${operator} ${in} ${out}")
         self.assertEqual(sys.modules["__main__"].__dict__["tmp_directory"], a)
 
     @unittest.expectedFailure
     def test_unexisting_function(self):
         with self.assertRaises(Climaf_Operator_Error):
-            my_script = cscript('mycdo','mycdo ${operator} ${in} ${out}')
+            cscript('mycdo', 'mycdo ${operator} ${in} ${out}')
 
     def test_simple_cscript(self):
-        my_script = cscript('mycdo','(cdo ${operator} ${in} ${out})')
+        my_script = cscript('mycdo', '(cdo ${operator} ${in} ${out})')
         self.assertDictEqual(my_script.inputs, {0: ('in', False, False)})
         self.assertDictEqual(my_script.outputs, {None: '%s', '': '%s'})
         self.assertEqual(my_script.name, "mycdo")
@@ -90,11 +90,14 @@ class CscriptTest(unittest.TestCase):
         help(mycdo)
 
     def test_complex_cscript(self):
-        my_script = cscript('mycdo2','(cdo ${operator} ${in_1} ${in_2} ${period} ${var} ${alias} ${missing} ${domain} ${out_tas})', format="txt")
+        my_script = cscript('mycdo2',
+                            '(cdo ${operator} ${in_1} ${in_2} ${period} ${var} ${alias} ${missing} ${domain} '
+                            '${out_tas})', format="txt")
         self.assertDictEqual(my_script.inputs, {1: ('in_1', False, False), 2: ('in_2', False, False)})
         self.assertDictEqual(my_script.outputs, {'tas': '%s'})
         self.assertEqual(my_script.name, "mycdo2")
-        self.assertEqual(my_script.command, '(cdo ${operator} ${in_1} ${in_2} ${period} ${var} ${alias} ${missing} ${domain} ${out_tas})')
+        self.assertEqual(my_script.command,
+                         '(cdo ${operator} ${in_1} ${in_2} ${period} ${var} ${alias} ${missing} ${domain} ${out_tas})')
         self.assertIsNone(my_script.fixedfields)
         self.assertEqual(my_script.flags, scriptFlags(canSelectVar=True, canSelectTime=True, canSelectDomain=True,
                                                       canAlias=True, canMissing=True))
@@ -105,38 +108,40 @@ class CscriptTest(unittest.TestCase):
 
     def test_errors(self):
         with self.assertRaises(Climaf_Operator_Error):
-            cscript('mycdo2','(cdo ${operator} ${in_1} ${mmin_2} ${out})')
+            cscript('mycdo2', '(cdo ${operator} ${in_1} ${mmin_2} ${out})')
         with self.assertRaises(Climaf_Operator_Error):
-            cscript('mycdo2','(cdo ${operator} ${in_1} ${mmins_2} ${out})')
+            cscript('mycdo2', '(cdo ${operator} ${in_1} ${mmins_2} ${out})')
         with self.assertRaises(Climaf_Operator_Error):
-            cscript('mycdo2','(cdo ${operator} ${in_1} ${in_1} ${out})')
+            cscript('mycdo2', '(cdo ${operator} ${in_1} ${in_1} ${out})')
         with self.assertRaises(Climaf_Operator_Error):
-            cscript('mycdo2','(cdo ${operator} ${out})')
+            cscript('mycdo2', '(cdo ${operator} ${out})')
         with self.assertRaises(Climaf_Operator_Error):
-            cscript('mycdo2','(cdo ${operator} ${mmins} ${out})')
+            cscript('mycdo2', '(cdo ${operator} ${mmins} ${out})')
         with self.assertRaises(Climaf_Operator_Error):
-            cscript('mycdo2','(cdo ${operator} ${in_3} ${in_5} ${out})')
+            cscript('mycdo2', '(cdo ${operator} ${in_3} ${in_5} ${out})')
         with self.assertRaises(Climaf_Operator_Error):
-            cscript('mycdo2','(cdo ${operator} ${in} ${out})', format="fa")
+            cscript('mycdo2', '(cdo ${operator} ${in} ${out})', format="fa")
 
     def test_repr(self):
-        my_script = cscript('mycdo','(cdo ${operator} ${in} ${out})')
+        my_script = cscript('mycdo', '(cdo ${operator} ${in} ${out})')
         self.assertEqual(repr(my_script), "CliMAF operator : mycdo")
 
 
 class FixedFieldsTest(unittest.TestCase):
 
     def test_fixed_fields(self):
-        fixed_fields('minus', ('mesh_hgr.nc','/data/climaf/${project}/${model}/ORCA1_mesh_hgr.nc'),
-                     ('mesh_zgr.nc','/data/climaf/${project}/${model}/ORCA1_mesh_zgr.nc'))
+        fixed_fields('minus', ('mesh_hgr.nc', '/data/climaf/${project}/${model}/ORCA1_mesh_hgr.nc'),
+                     ('mesh_zgr.nc', '/data/climaf/${project}/${model}/ORCA1_mesh_zgr.nc'))
         fixed_fields(['plot', ],
-                     ('coordinates.nc','/cnrm/ioga/Users/chevallier/chevalli/Partage/NEMO/eORCA_R025_coordinates_v1.0.nc'))
+                     ('coordinates.nc',
+                      '/cnrm/ioga/Users/chevallier/chevalli/Partage/NEMO/eORCA_R025_coordinates_v1.0.nc'))
         from climaf.environment import scripts
         self.assertEqual(scripts["minus"].fixedfields,
-                         (('mesh_hgr.nc','/data/climaf/${project}/${model}/ORCA1_mesh_hgr.nc'),
-                          ('mesh_zgr.nc','/data/climaf/${project}/${model}/ORCA1_mesh_zgr.nc')))
+                         (('mesh_hgr.nc', '/data/climaf/${project}/${model}/ORCA1_mesh_hgr.nc'),
+                          ('mesh_zgr.nc', '/data/climaf/${project}/${model}/ORCA1_mesh_zgr.nc')))
         self.assertEqual(scripts["plot"].fixedfields,
-                         (('coordinates.nc','/cnrm/ioga/Users/chevallier/chevalli/Partage/NEMO/eORCA_R025_coordinates_v1.0.nc'), ))
+                         (('coordinates.nc',
+                           '/cnrm/ioga/Users/chevallier/chevalli/Partage/NEMO/eORCA_R025_coordinates_v1.0.nc'), ))
 
 
 class CoperatorTest(unittest.TestCase):
@@ -150,15 +155,15 @@ class CoperatorTest(unittest.TestCase):
 class DeriveTest(unittest.TestCase):
 
     def test_derive_from_script(self):
-        derive("erai", 'ta','rescale', 't', scale=1., offset=0.)
-        derive('*', dict(out='rscre'),'minus','rs','rscs')
+        derive("erai", 'ta', 'rescale', 't', scale=1., offset=0.)
+        derive('*', dict(out='rscre'), 'minus', 'rs', 'rscs')
         self.assertIsNone(derive("erai", "ta2", "minus", "t", "ta", "rscre"))
         from climaf.environment import derived_variables
         self.assertEqual(derived_variables["erai"]["ta"], ('rescale', 'out', ['t'], {'scale': 1.0, 'offset': 0.0}))
         self.assertEqual(derived_variables["*"]["rscre"], ('minus', 'out', ['rs', 'rscs'], {}))
         self.assertNotIn("ta2", derived_variables["erai"])
         with self.assertRaises(Climaf_Operator_Error):
-            derive("CMIP5", dict(my_out_name='ta2'),'rescale', 't', scale=2., offset=-154.3)
+            derive("CMIP5", dict(my_out_name='ta2'), 'rescale', 't', scale=2., offset=-154.3)
 
     @unittest.skipUnless(False, "Not implemented")
     def test_derive_from_operator(self):
@@ -174,8 +179,8 @@ class DeriveTest(unittest.TestCase):
 class IsDerivedVariableTest(unittest.TestCase):
 
     def setUp(self):
-        derive("erai", 'ta','rescale', 't', scale=1., offset=0.)
-        derive('*', 'rscre','minus','rs','rscs')
+        derive("erai", 'ta', 'rescale', 't', scale=1., offset=0.)
+        derive('*', 'rscre', 'minus', 'rs', 'rscs')
 
     def test_is_derived_variable(self):
         self.assertTrue(is_derived_variable("ta", "erai"))
@@ -186,8 +191,8 @@ class IsDerivedVariableTest(unittest.TestCase):
 class DerivedVariableTest(unittest.TestCase):
 
     def setUp(self):
-        derive("erai", 'ta','rescale', 't', scale=1., offset=0.)
-        derive('*', 'rscre','minus','rs','rscs')
+        derive("erai", 'ta', 'rescale', 't', scale=1., offset=0.)
+        derive('*', 'rscre', 'minus', 'rs', 'rscs')
 
     def test_derived_variable(self):
         self.assertIsNone(derived_variable("my_variable", "my_project"))

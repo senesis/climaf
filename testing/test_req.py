@@ -16,43 +16,45 @@ import os
 
 class A_externals(unittest.TestCase):
     def setUp(self):
-        pass
+        def test_binary(binary, test_command="type %s > /dev/null 2>&1", error_msg="Cannot execute %s"):
+            self.assertEqual(os.system(test_command % binary), 0, error_msg % binary)
+        self.my_test=test_binary
 
     def test_1_convert(self):
-        bin = "convert"
-        self.assertEqual(os.system("type %s > /dev/null 2>&1" % bin), 0, "Cannot execute %s" % bin)
+        binary = "convert"
+        self.my_test(binary=binary)
 
     def test_2_identify(self):
-        bin = "identify"
-        self.assertEqual(os.system("type %s > /dev/null 2>&1" % bin), 0, "Cannot execute %s" % bin)
+        binary = "identify"
+        self.my_test(binary=binary)
 
     def test_3_ncatted(self):
-        bin = "ncatted"
-        self.assertEqual(os.system("type %s > /dev/null 2>&1" % bin), 0, "Cannot execute %s" % bin)
+        binary = "ncatted"
+        self.my_test(binary=binary)
 
     def test_4_ncdump(self):
-        bin = "ncdump"
-        self.assertEqual(os.system("type %s > /dev/null 2>&1" % bin), 0, "Cannot execute %s" % bin)
+        binary = "ncdump"
+        self.my_test(binary=binary)
 
     def test_5_ncwa(self):
-        bin = "convert"
-        self.assertEqual(os.system("type %s > /dev/null 2>&1" % bin), 0, "Cannot execute %s" % bin)
+        binary = "convert"
+        self.my_test(binary=binary)
 
     def test_6_ncrcat(self):
-        bin = "ncrcat"
-        self.assertEqual(os.system("type %s > /dev/null 2>&1" % bin), 0, "Cannot execute %s" % bin)
+        binary = "ncrcat"
+        self.my_test(binary=binary)
 
     def test_7_cdo(self):
-        bin = "cdo"
-        self.assertEqual(os.system("type %s > /dev/null 2>&1" % bin), 0, "Cannot execute %s" % bin)
+        binary = "cdo"
+        self.my_test(binary=binary)
 
     def test_9_cdo(self):
-        bin = "ncview"
-        self.assertEqual(os.system("type %s > /dev/null 2>&1" % bin), 0, "You may have troubles without %s" % bin)
+        binary = "ncview"
+        self.my_test(binary=binary, error_msg="You may have troubles without %s")
 
     def test_ncl(self):
-        bin = "ncl"
-        self.assertEqual(os.system("type %s > /dev/null 2>&1" % bin), 0, "You may have troubles without %s" % bin)
+        binary = "ncl"
+        self.my_test(binary=binary, error_msg="You may have troubles without %s")
 
     def tearDown(self):
         pass

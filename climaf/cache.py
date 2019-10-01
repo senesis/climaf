@@ -136,7 +136,8 @@ def generateUniqueFileName_safe(expression, operator=None, format="nc"):
         number += 2
         if number >= len(full):
             clogger.critical("Critical issue in cache : " + str(len(full)) + " digits is not enough for " + expression)
-            raise Climaf_Cache_Error("Critical issue in cache : " + str(len(full)) + " digits is not enough for " + expression)
+            raise Climaf_Cache_Error("Critical issue in cache : " + str(len(full)) + " digits is not enough for " +
+                                     expression)
         guess = full[0: number - 1]
         existing = searchFile(prefix + stringToPath(guess, directoryNameLength) + "." + format)
         if existing:
@@ -153,13 +154,13 @@ def generateUniqueFileName_safe(expression, operator=None, format="nc"):
 
 def stringToPath(name, length):
     """ Breaks NAME to a path with LENGTH characters-long directory names , for avoiding crowded directories"""
-    l = len(name)
+    actual_length = len(name)
     rep = ""
     i = 0
-    while i + length < l:
+    while i + length < actual_length:
         rep = rep + name[i:i + length] + "/"
         i += length
-    rep += name[i:l]
+    rep += name[i:actual_length]
     return rep
 
 
@@ -209,7 +210,7 @@ def register(filename, crs, outfilename=None):
             command = "ncatted -h -a CRS_def,global,o,c,\"%s\" -a CliMAF,global,o,c,\"CLImate Model Assessment " \
                       "Framework version %s (http://climaf.rtfd.org)\" %s" % (crs, version, filename)
         if re.findall(".png$", filename):
-            crs2 = crs.replace("%", "\%")
+            crs2 = crs.replace(r"%", r"\%")
             command = "convert -set \"CRS_def\" \"%s\" -set \"CliMAF\" \"CLImate Model Assessment Framework version " \
                       "%s (http://climaf.rtfd.org)\" %s %s.png && mv -f %s.png %s" % \
                       (crs2, version, filename, filename, filename, filename)
@@ -284,8 +285,8 @@ def rename(filename, crs):
     crs2filename """
     newfile = generateUniqueFileName(crs, format="nc")
     if newfile:
-        l = [c for c in crs2filename if crs2filename[c] == filename]
-        for c in l:
+        crs_list = [c for c in crs2filename if crs2filename[c] == filename]
+        for c in crs_list:
             crs2filename.pop(c)
         os.rename(filename, newfile)
         register(newfile, crs)
@@ -647,7 +648,8 @@ def list_cache():
     for dir_cache in cachedirs:
         rep = os.path.expanduser(dir_cache)
         find_return += os.popen(
-            "find %s -type f \( -name '*.png' -o -name '*.nc' -o -name '*.pdf' -o -name '*.eps' \) -print" % rep).read()
+            r"find %s -type f \( -name '*.png' -o -name '*.nc' -o -name '*.pdf' -o -name '*.eps' \) -print" % rep) \
+            .read()
     files_in_cache = find_return.split('\n')
     files_in_cache.pop(-1)
     return files_in_cache
@@ -743,7 +745,7 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
     var_find = False
     if size or age or access != 0:
         var_find = True
-        command = "find %s -type f \( -name '*.png' -o -name '*.nc' -o -name '*.pdf' -o -name '*.eps' \) %s -print" % \
+        command = r"find %s -type f \( -name '*.png' -o -name '*.nc' -o -name '*.pdf' -o -name '*.eps' \) %s -print" % \
                   (rep, opt_find)
         clogger.debug("Find command is :" + command)
 

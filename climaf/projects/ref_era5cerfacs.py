@@ -57,7 +57,7 @@ if atTGCC:
 if atIDRIS:
     root = "/workgpfs/rech/psl/rpsl035/IGCM/ReferenceDatasets/"
 if atCerfacs:
-    root="/data/scratch/globc/dcom/globc_obs/OBS4MIPS_ANA4MIPS_CMOR/Tier1/ERA5/"
+    root = "/data/scratch/globc/dcom/globc_obs/OBS4MIPS_ANA4MIPS_CMOR/Tier1/ERA5/"
 if atCNRM:
     root = "/cnrm/est/COMMON/climaf/reference_datasets_from_IPSL/"
 
@@ -80,4 +80,4 @@ if root:
     pattern1 = root + "${variable}_${table}_${obs_type}_${product}_${PERIOD}.nc"
     dataloc(project='ref_era5cerfacs', organization='generic', url=[pattern1])
 
-#calias("ref_era5cerfacs","tas",offset=273.15)
+# calias("ref_era5cerfacs","tas",offset=273.15)

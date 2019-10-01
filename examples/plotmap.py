@@ -24,13 +24,13 @@ ta = time_average(dg)
 
 # A NCL-quality plot, using standard operator plot
 #############################################################
-map = plot(ta, title="TAS")
+map_complete = plot(ta, title="TAS")
 
 # Ensure figure is computed, and get its cache filename in CliMAF disk cache
-figfile = cfile(map)
+figfile = cfile(map_complete)
 
 # Displaying a figure object will compute and cache it if not already done
-cshow(map)
+cshow(map_complete)
 
 
 # A more comprehensive way of configuring plots

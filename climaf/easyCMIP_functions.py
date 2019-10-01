@@ -210,11 +210,10 @@ def save_req_file(ens_obj, filename='test.txt', separator=' '):
 
     """
     if '.txt' in filename:
-        file = open(filename, "w")
-        for elt in ens_obj.order:
-            print(elt + separator + cfile(ens_obj[elt]))
-            file.write(elt + separator + cfile(ens_obj[elt]) + ' \n')
-        file.close()
+        with open(filename, "w") as outfile:
+            for elt in ens_obj.order:
+                print(elt + separator + cfile(ens_obj[elt]))
+                outfile.write(elt + separator + cfile(ens_obj[elt]) + ' \n')
     if '.json' in filename:
         import json
         json_dict = dict()

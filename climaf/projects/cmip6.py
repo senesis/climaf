@@ -38,7 +38,7 @@ if root:
     # -- Declare a 'CMIP6 CliMAF project
     # ------------------------------------ >
     cproject('CMIP6', 'root', 'model', 'institute', 'mip', 'table', 'experiment', 'realization',
-             'grid', 'version', ensemble=['model','realization'], separator='%')
+             'grid', 'version', ensemble=['model', 'realization'], separator='%')
 
     # -- Declare a CMIP6 'extent' CliMAF project = extracts a period covering historical and a scenario
     # ------------------------------------ >

@@ -1209,10 +1209,9 @@ def eds(first=None, **kwargs):
             att = listattr2.pop(0)
             newcomb = []
             for c in comb:
+                init_list = copy.deepcopy(c)
                 for v in attval[att]:
-                    l = [e for e in c]
-                    l.append((att, v))
-                    newcomb.append(l)
+                    newcomb.append(init_list + [(att, v)])
             comb = newcomb
         orderl = []
         for c in comb:
@@ -2045,10 +2044,10 @@ def guess_projects(crs):
         for sep in separators:
             counts[sep] = crs.count(sep)
         # Assume that the highest count gives the right separator
-        max = 0
+        max_separators = 0
         for key in counts:
-            if counts[key] >= max:
-                max = counts[key]
+            if counts[key] >= max_separators:
+                max_separators = counts[key]
                 sep = key
         return crs[1:crs.find(sep)]
 

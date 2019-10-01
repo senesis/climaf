@@ -40,15 +40,15 @@ else:
     if selfs in vfiles:
         vfiles.remove(sys.argv[0])
 
-for file in vfiles:
+for a_file in vfiles:
 
     if args.verbosity or args.upper_verbosity:
-        print("'%s'..." % file)
+        print("'%s'..." % a_file)
 
     if args.upper_verbosity:
-        ex = subprocess.Popen(["python", file])
+        ex = subprocess.Popen(["python", a_file])
     else:
-        ex = subprocess.Popen(["/usr/bin/python", file], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        ex = subprocess.Popen(["/usr/bin/python", a_file], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     if ex.wait() == 0:  # code retour
         if args.verbosity:

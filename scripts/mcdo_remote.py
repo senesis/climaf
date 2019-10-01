@@ -20,7 +20,10 @@ import getpass
 import netrc
 from dateutil import tz
 import future
-import tkinter
+try:
+    import tkinter
+except ImportError:
+    import Tkinter as tkinter
 
 # Climaf
 from climaf import __path__ as cpath, remote_cachedir
@@ -167,10 +170,10 @@ for host, username in host_user2:
     for ffile in host_user2[host, username]:
         if not os.path.exists(os.path.expanduser(remote_cachedir) + '/' + host + ffile) or host in dynamic_host:
             filename = os.path.basename(ffile)
-            dir = os.path.dirname(ffile)
-            if not os.path.exists(os.path.expanduser(remote_cachedir) + '/' + host + dir):
-                os.makedirs(os.path.expanduser(remote_cachedir) + '/' + host + dir)
-            connect.cwd(dir)
+            a_dir = os.path.dirname(ffile)
+            if not os.path.exists(os.path.expanduser(remote_cachedir) + '/' + host + a_dir):
+                os.makedirs(os.path.expanduser(remote_cachedir) + '/' + host + a_dir)
+            connect.cwd(a_dir)
             if host in dynamic_host and \
                     os.path.exists(os.path.expanduser(remote_cachedir) + '/' + host + ffile):
                 filetransfer = False

@@ -82,7 +82,6 @@ def capply_operator(climaf_operator, *operands, **parameters):
     """
     clogger.error("Not yet developped - TBD")
     raise NotImplementedError("Could not yet apply an operator.")
-    return None
 
 
 def capply_script(script_name, *operands, **parameters):
@@ -343,13 +342,13 @@ def ceval_for_ctree(cobject, userflags=None, format="MaskedArray", deep=None, de
     ##########################################################################
     # TBD  : analyze if the dataset is remote and the remote place 'offers' the operator
     if cobject.operator in get_variable("scripts"):
-        file = ceval_script(cobject, deep,
-                            recurse_list=recurse_list)  # Does return a filename, or list of filenames
+        # Does return a filename, or list of filenames
+        file_rep = ceval_script(cobject, deep, recurse_list=recurse_list)
         cdedent()
         if format == 'file':
-            return file
+            return file_rep
         else:
-            return cread(file, classes.varOf(cobject))
+            return cread(file_rep, classes.varOf(cobject))
     elif cobject.operator in get_variable("operators"):
         # TODO: Implement ceval_operator
         obj = ceval_operator(cobject, deep)
@@ -475,12 +474,12 @@ def ceval_for_cpage(cobject, userflags=None, format="MaskedArray", deep=None, de
             return cread(filename, classes.varOf(cobject))
     if not deep:
         deep = None
-    file = cfilePage(cobject, deep, recurse_list=recurse_list)
+    file_rep = cfilePage(cobject, deep, recurse_list=recurse_list)
     cdedent()
     if format == 'file':
-        return file
+        return file_rep
     else:
-        return cread(file)  # !! Does it make sense ?
+        return cread(file_rep)  # !! Does it make sense ?
 
 
 def ceval_for_cpage_pdf(cobject, userflags=None, format="MaskedArray", deep=None, derived_list=list(),
@@ -514,12 +513,12 @@ def ceval_for_cpage_pdf(cobject, userflags=None, format="MaskedArray", deep=None
             return cread(filename, classes.varOf(cobject))
     if not deep:
         deep = None
-    file = cfilePage_pdf(cobject, deep, recurse_list=recurse_list)
+    file_rep = cfilePage_pdf(cobject, deep, recurse_list=recurse_list)
     cdedent()
     if format == 'file':
-        return file
+        return file_rep
     else:
-        return cread(file)  # !! Does it make sense ?
+        return cread(file_rep)  # !! Does it make sense ?
 
 
 def ceval_for_cens(cobject, userflags=None, format="MaskedArray", deep=None, derived_list=list(),
@@ -822,9 +821,9 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
         subdict_ff["project"] = classes.projectOf(scriptCall.operands[0])
         subdict_ff["realm"] = classes.realmOf(scriptCall.operands[0])
         subdict_ff["grid"] = classes.gridOf(scriptCall.operands[0])
-        l = script.fixedfields  # return paths: (linkname, targetname)
+        list_fixedfields = script.fixedfields  # return paths: (linkname, targetname)
         files_exist = dict()
-        for ll, lt in l:
+        for ll, lt in list_fixedfields:
             # Replace input data placeholders with filenames for fixed fields
             template_ff_target = Template(lt).substitute(subdict_ff)
             # symlink if needed
