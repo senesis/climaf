@@ -158,12 +158,10 @@ class CreatePeriodGenericTests(unittest.TestCase):
     def test_iso(self):
         self.assertEqual(self.my_period.iso(), ",".join([self.my_date_1.isoformat(), self.my_date_2_60.isoformat()]))
 
-    @unittest.expectedFailure
     def test_hasFullYear(self):
         self.assertTrue(self.my_period.hasFullYear(1900))
         self.assertFalse(self.my_period.hasFullYear("1700"))
         self.assertFalse(self.my_period.hasFullYear(2000))
-        # TODO: Understand why the following test fails...
         self.assertFalse(self.my_period_4.hasFullYear(1920))
 
     def test_start_with(self):
@@ -303,16 +301,15 @@ class SortPeriodsListTests(unittest.TestCase):
         # TODO: Check the type of arguments and that a list of periods if passed as an argument and nothing else
         pass
 
-    @unittest.expectedFailure
     def test_sort(self):
-        # TODO: Check why it does not work...
         my_period_1 = cperiod(datetime(1850, 1, 2), datetime(1950, 3, 4))
         my_period_2 = cperiod(datetime(1740, 5, 6), datetime(1850, 1, 6, 14))
         my_period_3 = cperiod(datetime(1800, 5, 2), datetime(1847, 6, 3))
         my_period_4 = cperiod(datetime(2000, 5, 6), datetime(2061, 4, 9))
-        ordered_list = [my_period_2, my_period_3, my_period_1, my_period_1, my_period_4]
-        unordered_list = [my_period_1, my_period_4, my_period_3, my_period_2]
-        self.assertEqual(sort_periods_list(unordered_list), ordered_list)
+        ordered_list = [my_period_2, my_period_3, my_period_1, my_period_4]
+        unordered_list = [my_period_1, my_period_4, my_period_1, my_period_3, my_period_2]
+        re_ordered_list = sort_periods_list(unordered_list)
+        self.assertEqual(re_ordered_list, ordered_list, re_ordered_list)
 
 
 class MergePeriodsTests(unittest.TestCase):
@@ -322,9 +319,7 @@ class MergePeriodsTests(unittest.TestCase):
         # TODO: Check the type of arguments and that a list of periods if passed as an argument and nothing else
         pass
 
-    @unittest.expectedFailure
     def test_merge(self):
-        # TODO: Check why it does not work...
         my_period_1 = cperiod(datetime(1850, 1, 2), datetime(1950, 3, 4))
         my_period_2 = cperiod(datetime(1740, 5, 6), datetime(1850, 1, 6, 14))
         my_period_3 = cperiod(datetime(1800, 5, 2), datetime(1847, 6, 3))
@@ -341,17 +336,27 @@ class IntersectPeriodsListsTests(unittest.TestCase):
         # TODO: Check the type of arguments and that a list of periods if passed as an argument and nothing else
         pass
 
-    @unittest.expectedFailure
     def test_intersect(self):
-        # TODO: Check why it does not work...
-        my_period_1 = cperiod(datetime(1850, 1, 2), datetime(1950, 3, 4))
-        my_period_2 = cperiod(datetime(1740, 5, 6), datetime(1850, 1, 6, 14))
-        my_period_3 = cperiod(datetime(1800, 5, 2), datetime(1847, 6, 3))
-        my_period_4 = cperiod(datetime(1900, 5, 6), datetime(2061, 4, 9))
+        my_date_1 = datetime(1850, 1, 2)
+        my_date_2 = datetime(1950, 3, 4)
+        my_date_3 = datetime(1740, 5, 6)
+        my_date_4 = datetime(1850, 1, 6, 14)
+        my_date_5 = datetime(1800, 5, 2)
+        my_date_6 = datetime(1847, 6, 3)
+        my_date_7 = datetime(1900, 5, 6)
+        my_date_8 = datetime(2061, 4, 9)
+        my_period_1 = cperiod(my_date_1, my_date_2)
+        my_period_2 = cperiod(my_date_3, my_date_4)
+        my_period_3 = cperiod(my_date_5, my_date_6)
+        my_period_4 = cperiod(my_date_7, my_date_8)
+        my_period_5 = cperiod(my_date_5, my_date_6)
+        my_period_6 = cperiod(my_date_1, my_date_4)
+        my_period_7 = cperiod(my_date_7, my_date_2)
         my_list_1 = [my_period_1, my_period_3]
         my_list_2 = [my_period_2, my_period_4]
-        result_list = []
-        self.assertEqual(intersect_periods_list(my_list_1, my_list_2), result_list)
+        my_lists_intersect = intersect_periods_list(my_list_1, my_list_2)
+        result_list = [my_period_5, my_period_6, my_period_7]
+        self.assertEqual(my_lists_intersect, result_list, my_lists_intersect)
 
 
 class LastYearsTest(unittest.TestCase):
@@ -362,10 +367,9 @@ class LastYearsTest(unittest.TestCase):
         # TODO: Test string conversion, should not work...
         pass
 
-    @unittest.expectedFailure
     def test_last_years(self):
         my_period = cperiod(datetime(1850, 1, 1), datetime(1859, 5, 25))
-        self.assertEqual(lastyears(my_period, 1), repr(init_period("18580526-18590525")))
+        self.assertEqual(lastyears(my_period, 1), repr(init_period("18580525-18590524")))
         self.assertEqual(lastyears(my_period, 15), repr(my_period))
 
 
@@ -377,9 +381,8 @@ class FirstYearsTest(unittest.TestCase):
         # TODO: Test string conversion, should not work...
         pass
 
-    @unittest.expectedFailure
-    def test_last_years(self):
-        my_period = cperiod(datetime(1850, 6, 23), datetime(1859,1,1))
+    def test_first_years(self):
+        my_period = cperiod(datetime(1850, 6, 23), datetime(1859, 1, 1))
         self.assertEqual(firstyears(my_period, 1), repr(init_period("18500623-18510622")))
         self.assertEqual(firstyears(my_period, 15), repr(my_period))
 

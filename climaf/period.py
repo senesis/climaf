@@ -123,7 +123,13 @@ class cperiod():
     def hasFullYear(self, year):
         if self.fx:
             raise Climaf_Period_Error("Meaningless for period 'fx'")
-        return int(year) in range(self.start.year, self.end.year + 1)
+        if isinstance(year, cperiod):
+            return self.includes(year)
+        else:
+            if not isinstance(year, six.string_types):
+                year = str(year)
+            year = init_period(year)
+            return self.includes(year)
 
     #
     def start_with(self, begin):
@@ -295,18 +301,19 @@ def sort_periods_list(periods_list):
         """
         if tree is None:
             return SortTree(el)
-        if repr(tree.pivot) == repr(el):
-            return tree  # Discard identical periods
-        if el.is_before(tree.pivot):
-            tree.smaller = insert(el, tree.smaller)
         else:
-            tree.larger = insert(el, tree.larger)
-        return tree
+            if tree.pivot == el:
+                pass  # Discard identical periods
+            elif el.is_before(tree.pivot):
+                tree.smaller = insert(el, tree.smaller)
+            else:
+                tree.larger = insert(el, tree.larger)
+            return tree
 
     #
     def walk(tree):
         if tree is None:
-            return []
+            return list()
         rep = walk(tree.smaller)
         rep.append(tree.pivot)
         rep.extend(walk(tree.larger))
@@ -321,12 +328,12 @@ def sort_periods_list(periods_list):
 
 
 def merge_periods(remain_to_merge, already_merged=[]):
-    if already_merged == []:
+    if len(already_merged) == 0:
         if len(remain_to_merge) < 2:
             return remain_to_merge
         sorted = sort_periods_list(remain_to_merge)
         return merge_periods(sorted[1:], [sorted[0]])
-    if len(remain_to_merge) > 0:
+    else:
         last = already_merged[-1]
         next_one = remain_to_merge.pop(0)
         # print "last.end=",last.end,"next.start=",next_one.start
@@ -363,6 +370,44 @@ def intersect_periods_list(lperiod1, lperiod2):
     return merge_periods(big)
 
 
+def find_correct_date(year, month, day, hour, minute, second, shift="next"):
+    """
+    Giving year, month, day, hour, minute, second, find out which is the next existing date
+    (if a date does not exists with the specified parameters) by shifting the parameters toward the future.
+    :param int year: years of the date
+    :param int month: months of the date
+    :param int day: days of the date
+    :param int hour: hours of the date
+    :param int minute: minutes of the date
+    :param int second: seconds of the date
+    :param six.string_types shift: if needed, shift the correct date after ("next") or before ("previous") the one found
+    :return datetime.datetime: object corresponding to the next existing date
+    """
+    new_end_date = None
+    offset = 0
+    if shift == "next":
+        offset_sign = 1
+    elif shift == "previous":
+        offset_sign = -1
+    else:
+        clogger.error("Unknown shift option %s" % shift)
+        raise ValueError("Unknown shift option %s" % shift)
+    while new_end_date is None and day > 0:
+        try:
+            new_end_date = datetime.datetime(year=year, month=month, day=day, hour=hour, minute=minute, second=second)
+        except ValueError:
+            day -= offset_sign
+            offset += offset_sign
+    if day <= 0:
+        clogger.error("Could not find a correct date")
+        raise ValueError("Could not find a correct date")
+    if offset > 0:
+        month += 1
+        day = offset
+        new_end_date = find_correct_date(year=year, month=month, day=day, hour=hour, minute=minute, second=second)
+    return new_end_date
+
+
 def lastyears(period, nyears):
     """
     Returns a period ending at PERIOD's end and which duration is at most NYEARS
@@ -370,12 +415,13 @@ def lastyears(period, nyears):
     # print "period=",period, 'type=',type(period),'nyears=',nyears
     if isinstance(period, six.string_types):
         period = cperiod(period)
-    rep = cperiod(period.start, period.end)
-    yend = rep.end.year
-    ystart = rep.start.year
-    if ystart < yend - nyears:
-        s = rep.start
-        rep.start = datetime.datetime(year=yend - nyears, month=s.month, day=s.day, hour=s.hour, minute=s.minute)
+    theorical_start_year = find_correct_date(year=period.end.year - nyears, month=period.end.month, day=period.end.day,
+                                             hour=period.end.hour, minute=period.end.minute, second=period.end.second,
+                                             shift="next")
+    if theorical_start_year > period.start:
+        rep = cperiod(theorical_start_year, period.end)
+    else:
+        rep = period
     return repr(rep)
 
 
@@ -385,14 +431,13 @@ def firstyears(period, nyears):
     """
     if isinstance(period, six.string_types):
         period = cperiod(period)
-    rep = cperiod(period.start, period.end)
-    yend = rep.end.year
-    ystart = rep.start.year
-    if yend > ystart + nyears:
-        s = rep.end
-        rep.end = datetime.datetime(year=ystart + nyears, month=s.month, day=s.day, hour=s.hour, minute=s.minute)
-    # print "period=",period, 'type=',type(period),'nyears=',nyears
-    # print rep
+    theorical_end_year = find_correct_date(year=period.start.year + nyears, month=period.start.month,
+                                           day=period.start.day, hour=period.start.hour, minute=period.start.minute,
+                                           second=period.start.second, shift="previous")
+    if theorical_end_year < period.end:
+        rep = cperiod(period.start, theorical_end_year)
+    else:
+        rep = period
     return repr(rep)
 
 
