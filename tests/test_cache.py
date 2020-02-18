@@ -318,7 +318,7 @@ class RebuildTests(unittest.TestCase):
 
 if __name__ == '__main__':
     # Jump into the test directory
-    tmp_directory = "/".join([os.environ["HOME"], "tmp", "tests", "test_cache"])
+    tmp_directory = os.sep.join([os.environ["CLIMAF_CACHE"] + "_tests", "test_cache"])
     remove_dir_and_content(tmp_directory)
     if not os.path.isdir(tmp_directory):
         os.makedirs(tmp_directory)
