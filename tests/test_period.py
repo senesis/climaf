@@ -145,6 +145,9 @@ class CreatePeriodGenericTests(unittest.TestCase):
         self.assertFalse(cperiod("fx") == self.my_period)
         self.assertTrue(self.my_period_3 != self.my_period_4)
 
+    def test_hash(self):
+        hash(self.my_period)
+
     @unittest.expectedFailure
     def test_repr(self):
         self.assertEqual(repr(self.my_period), "1850010100-1950123123")
